@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 3000;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6';
 const ANTHROPIC_VERSION = '2023-06-01';
-const UPSTREAM_TIMEOUT_MS = 20000;
+const UPSTREAM_TIMEOUT_MS = 40000;
 
 if (!ANTHROPIC_API_KEY) {
   console.warn(
@@ -202,7 +202,7 @@ app.post('/api/dubis', async (req, res) => {
     return res.status(400).json({ error: 'Too many messages in one request.' });
   }
   for (const m of messages) {
-    if (!m || (m.role !== 'user' && m.role !== 'assistant') || typeof m.content !== 'string' || m.content.length > 4000) {
+    if (!m || (m.role !== 'user' && m.role !== 'assistant') || typeof m.content !== 'string' || m.content.length > 12000) {
       return res.status(400).json({ error: 'Malformed message in request.' });
     }
   }
@@ -221,7 +221,7 @@ app.post('/api/dubis', async (req, res) => {
       },
       body: JSON.stringify({
         model: ANTHROPIC_MODEL,
-        max_tokens: 700,
+        max_tokens: 2048,
         system,
         messages
       })
