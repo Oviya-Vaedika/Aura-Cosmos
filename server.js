@@ -16,7 +16,7 @@ const auth = require('./lib/auth');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
-const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6';
+const ANTHROPIC_MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-5';
 const ANTHROPIC_VERSION = '2023-06-01';
 const UPSTREAM_TIMEOUT_MS = 40000;
 
