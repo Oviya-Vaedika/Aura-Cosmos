@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 3000;
 // ===========================================================
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 const UPSTREAM_TIMEOUT_MS = 40000;
 
 if (!GEMINI_API_KEY) {
