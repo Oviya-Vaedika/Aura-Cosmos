@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 3000;
 // ===========================================================
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = 'gemini-3.6-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 const UPSTREAM_TIMEOUT_MS = 40000;
 
 if (!GEMINI_API_KEY) {
@@ -86,16 +86,8 @@ function isValidUsername(v) {
 }
 
 function isValidPassword(v) {
-  if (
-    typeof v !== 'string' ||
-    v.length < 8 ||
-    v.length > 200
-  ) {
-    return false;
-  }
-
-  return /[a-zA-Z]/.test(v) &&
-    /[0-9]/.test(v);
+  if (typeof v !== 'string' || v.length < 8 || v.length > 200) return false;
+  return /[a-zA-Z]/.test(v) && /[0-9]/.test(v);
 }
 
 function publicUser(user) {
@@ -112,6 +104,7 @@ function publicUser(user) {
 =========================================================== */
 
 app.post('/api/auth/signup', async (req, res) => {
+
   if (authLimiter(clientIp(req))) {
     return res.status(429).json({
       error: 'Too many attempts. Please wait a minute and try again.'
@@ -119,6 +112,7 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 
   try {
+
     const { username, email, password } = req.body || {};
 
     if (!username || !email || !password) {
@@ -177,6 +171,7 @@ app.post('/api/auth/signup', async (req, res) => {
     });
 
   } catch (err) {
+
     console.error('[auth/signup] error:', err);
 
     return res.status(500).json({
@@ -187,6 +182,7 @@ app.post('/api/auth/signup', async (req, res) => {
 
 
 app.post('/api/auth/login', async (req, res) => {
+
   if (authLimiter(clientIp(req))) {
     return res.status(429).json({
       error: 'Too many attempts. Please wait a minute and try again.'
@@ -194,6 +190,7 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   try {
+
     const { identifier, password } = req.body || {};
 
     if (!identifier || !password) {
@@ -206,6 +203,10 @@ app.post('/api/auth/login', async (req, res) => {
       ? db.findUserByEmail(identifier)
       : db.findUserByUsername(identifier);
 
+    // Always run a bcrypt compare, even for unknown accounts, using a dummy
+    // hash — otherwise a missing account returns near-instantly while a real
+    // one takes bcrypt's compare time, letting an attacker enumerate valid
+    // emails/usernames purely from response timing despite the generic message.
     const ok = user
       ? await auth.verifyPassword(password, user.passwordHash)
       : await auth.verifyPassword(password, auth.DUMMY_HASH);
@@ -225,6 +226,7 @@ app.post('/api/auth/login', async (req, res) => {
     });
 
   } catch (err) {
+
     console.error('[auth/login] error:', err);
 
     return res.status(500).json({
@@ -234,16 +236,22 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 
-app.post('/api/auth/logout', auth.requireXhrHeader, (req, res) => {
-  auth.clearSessionCookie(res);
+app.post(
+  '/api/auth/logout',
+  auth.requireXhrHeader,
+  (req, res) => {
 
-  res.json({
-    ok: true
-  });
-});
+    auth.clearSessionCookie(res);
+
+    res.json({
+      ok: true
+    });
+  }
+);
 
 
 app.get('/api/auth/me', (req, res) => {
+
   const token =
     req.cookies &&
     req.cookies[auth.COOKIE_NAME];
@@ -280,17 +288,22 @@ app.get('/api/auth/me', (req, res) => {
    CLOUD PROGRESS ROUTES
 =========================================================== */
 
-app.get('/api/progress', auth.requireAuth, (req, res) => {
-  if (progressLimiter(clientIp(req))) {
-    return res.status(429).json({
-      error: 'Too many requests — please slow down a little.'
+app.get(
+  '/api/progress',
+  auth.requireAuth,
+  (req, res) => {
+
+    if (progressLimiter(clientIp(req))) {
+      return res.status(429).json({
+        error: 'Too many requests — please slow down a little.'
+      });
+    }
+
+    res.json({
+      progress: db.getProgress(req.userId)
     });
   }
-
-  res.json({
-    progress: db.getProgress(req.userId)
-  });
-});
+);
 
 
 app.put(
@@ -318,6 +331,7 @@ app.put(
     }
 
     try {
+
       const saved = db.saveProgress(
         req.userId,
         body
@@ -328,6 +342,7 @@ app.put(
       });
 
     } catch (err) {
+
       console.error('[progress/put] error:', err);
 
       res.status(500).json({
@@ -343,6 +358,7 @@ app.put(
 =========================================================== */
 
 app.post('/api/dubis', async (req, res) => {
+
   const ip = clientIp(req);
 
   if (dubisLimiter(ip)) {
@@ -376,6 +392,7 @@ app.post('/api/dubis', async (req, res) => {
   }
 
   for (const m of messages) {
+
     if (
       !m ||
       (m.role !== 'user' && m.role !== 'assistant') ||
@@ -388,14 +405,21 @@ app.post('/api/dubis', async (req, res) => {
     }
   }
 
+
+  // Convert Anthropic-style messages to Gemini format
+
   const contents = messages.map(m => ({
-    role: m.role === 'assistant' ? 'model' : 'user',
+    role: m.role === 'assistant'
+      ? 'model'
+      : 'user',
+
     parts: [
       {
         text: m.content
       }
     ]
   }));
+
 
   const controller = new AbortController();
 
@@ -404,13 +428,18 @@ app.post('/api/dubis', async (req, res) => {
     UPSTREAM_TIMEOUT_MS
   );
 
+
   try {
+
     const url =
       `https://generativelanguage.googleapis.com/v1beta/models/` +
       `${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
+
     const upstream = await fetch(url, {
+
       method: 'POST',
+
       signal: controller.signal,
 
       headers: {
@@ -418,6 +447,7 @@ app.post('/api/dubis', async (req, res) => {
       },
 
       body: JSON.stringify({
+
         systemInstruction: {
           parts: [
             {
@@ -431,13 +461,19 @@ app.post('/api/dubis', async (req, res) => {
         generationConfig: {
           maxOutputTokens: 2048
         }
+
       })
+
     });
+
 
     clearTimeout(timeoutId);
 
+
     if (!upstream.ok) {
-      const errText = await upstream.text().catch(() => '');
+
+      const errText =
+        await upstream.text().catch(() => '');
 
       console.error(
         `[dubis] Gemini upstream error ${upstream.status}:`,
@@ -454,7 +490,9 @@ app.post('/api/dubis', async (req, res) => {
       });
     }
 
+
     const data = await upstream.json();
+
 
     const reply =
       data?.candidates?.[0]?.content?.parts
@@ -462,7 +500,9 @@ app.post('/api/dubis', async (req, res) => {
         .join('')
         .trim();
 
+
     if (!reply) {
+
       console.error(
         '[dubis] Gemini returned an unexpected response:',
         JSON.stringify(data)
@@ -473,20 +513,28 @@ app.post('/api/dubis', async (req, res) => {
       });
     }
 
+
     return res.json({
       reply
     });
 
+
   } catch (err) {
+
     clearTimeout(timeoutId);
 
+
     if (err.name === 'AbortError') {
-      console.error('[dubis] Gemini request timed out');
+
+      console.error(
+        '[dubis] Gemini request timed out'
+      );
 
       return res.status(504).json({
         error: 'The AI service took too long to respond.'
       });
     }
+
 
     console.error(
       '[dubis] unexpected Gemini server error:',
@@ -497,6 +545,7 @@ app.post('/api/dubis', async (req, res) => {
       error: 'Unexpected server error.'
     });
   }
+
 });
 
 
@@ -505,16 +554,18 @@ app.post('/api/dubis', async (req, res) => {
 =========================================================== */
 
 app.get('/api/health', (req, res) => {
+
   res.json({
     ok: true,
     hasApiKey: Boolean(GEMINI_API_KEY)
   });
+
 });
 
 
-/* ---------------------------------------------------------
-   Static frontend
----------------------------------------------------------- */
+/* ===========================================================
+   STATIC FRONTEND
+=========================================================== */
 
 app.use(
   express.static(
@@ -522,7 +573,9 @@ app.use(
   )
 );
 
+
 app.get('*', (req, res) => {
+
   res.sendFile(
     path.join(
       __dirname,
@@ -530,11 +583,18 @@ app.get('*', (req, res) => {
       'index.html'
     )
   );
+
 });
 
 
+/* ===========================================================
+   START SERVER
+=========================================================== */
+
 app.listen(PORT, () => {
+
   console.log(
     `Aura Cosmos server listening on http://localhost:${PORT}`
   );
+
 });

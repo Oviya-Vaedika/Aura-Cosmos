@@ -1,7 +1,7 @@
 # Aura Cosmos
 
 Astrophysics learning app with Dubis, an AI companion. This version moves all calls
-to the Anthropic API behind a small Node/Express backend, so the API key never
+to the Gemini API behind a small Node/Express backend, so the API key never
 touches the browser.
 
 ## What changed
@@ -13,8 +13,8 @@ simply doesn't work outside a sandboxed environment.
 
 Now:
 - The frontend calls **`POST /api/dubis`** on your own server.
-- `server.js` holds `ANTHROPIC_API_KEY` server-side (via `.env`, never sent to
-  the browser) and forwards the request to Anthropic, returning just the reply text.
+- `server.js` holds `GEMINI_API_KEY` server-side (via `.env`, never sent to
+  the browser) and forwards the request to Google's Generative Language API, returning just the reply text.
 - The frontend UI, Dubis's personality, chat history, and all app functionality
   (chat panel, Daily Cosmic Mystery, Cosmic Quiz Battle) are unchanged — only the
   transport layer moved.
@@ -30,8 +30,8 @@ Now:
    ```
    cp .env.example .env
    ```
-   Then edit `.env` and set `ANTHROPIC_API_KEY=sk-ant-...` with a real key from
-   [console.anthropic.com](https://console.anthropic.com).
+   Then edit `.env` and set `GEMINI_API_KEY=...` with a real key from
+   [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
 
 3. Start the server:
    ```
@@ -43,7 +43,7 @@ Now:
 
 ## How the backend protects the API key
 
-- `ANTHROPIC_API_KEY` is read only from environment variables (`.env`, which is
+- `GEMINI_API_KEY` is read only from environment variables (`.env`, which is
   never sent to the browser and should stay out of version control).
 - `/api/dubis` validates the request body (system prompt + message array,
   size and role checks) before forwarding anything upstream.
@@ -69,7 +69,7 @@ feedback, and Cosmic Quiz Battle — since they all share the same function.
 ## Deploying
 
 Any Node host works (Render, Railway, Fly.io, a VPS, etc.). Set the
-`ANTHROPIC_API_KEY` environment variable in your host's dashboard/secrets
+`GEMINI_API_KEY` environment variable in your host's dashboard/secrets
 manager rather than committing a `.env` file. The server serves the static
 frontend itself, so there's nothing else to configure — point your host at
 `npm start`.
