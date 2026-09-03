@@ -25,10 +25,11 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL =
   process.env.GEMINI_MODEL || 'gemini-3.6-flash';
 
-const UPSTREAM_TIMEOUT_MS = 40000;
+// Faster timeout: 15 seconds
+const UPSTREAM_TIMEOUT_MS = 15000;
 
-// Number of additional attempts after the first request
-const GEMINI_MAX_RETRIES = 3;
+// 2 retries = maximum 3 attempts total
+const GEMINI_MAX_RETRIES = 2;
 
 if (!GEMINI_API_KEY) {
   console.warn(
@@ -165,8 +166,7 @@ app.post('/api/auth/signup', async (req, res) => {
       });
     }
 
-    const passwordHash =
-      await auth.hashPassword(password);
+    const passwordHash = await auth.hashPassword(password);
 
     const id = crypto.randomUUID();
 
@@ -194,7 +194,6 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 });
 
-
 app.post('/api/auth/login', async (req, res) => {
   if (authLimiter(clientIp(req))) {
     return res.status(429).json({
@@ -216,14 +215,8 @@ app.post('/api/auth/login', async (req, res) => {
       : db.findUserByUsername(identifier);
 
     const ok = user
-      ? await auth.verifyPassword(
-          password,
-          user.passwordHash
-        )
-      : await auth.verifyPassword(
-          password,
-          auth.DUMMY_HASH
-        );
+      ? await auth.verifyPassword(password, user.passwordHash)
+      : await auth.verifyPassword(password, auth.DUMMY_HASH);
 
     if (!user || !ok) {
       return res.status(401).json({
@@ -248,19 +241,14 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-
 app.post(
   '/api/auth/logout',
   auth.requireXhrHeader,
   (req, res) => {
     auth.clearSessionCookie(res);
-
-    res.json({
-      ok: true
-    });
+    res.json({ ok: true });
   }
 );
-
 
 app.get('/api/auth/me', (req, res) => {
   const token =
@@ -294,7 +282,6 @@ app.get('/api/auth/me', (req, res) => {
   });
 });
 
-
 /* ===========================================================
    CLOUD PROGRESS ROUTES
 =========================================================== */
@@ -314,7 +301,6 @@ app.get(
     });
   }
 );
-
 
 app.put(
   '/api/progress',
@@ -340,10 +326,7 @@ app.put(
     }
 
     try {
-      const saved = db.saveProgress(
-        req.userId,
-        body
-      );
+      const saved = db.saveProgress(req.userId, body);
 
       res.json({
         progress: saved
@@ -359,9 +342,8 @@ app.put(
   }
 );
 
-
 /* ===========================================================
-   DUBIS — GEMINI AI PROXY WITH AUTOMATIC RETRIES
+   DUBIS — GEMINI AI PROXY WITH FAST RETRIES
 =========================================================== */
 
 app.post('/api/dubis', async (req, res) => {
@@ -410,12 +392,8 @@ app.post('/api/dubis', async (req, res) => {
     }
   }
 
-  // Convert frontend messages to Gemini format
   const contents = messages.map(m => ({
-    role: m.role === 'assistant'
-      ? 'model'
-      : 'user',
-
+    role: m.role === 'assistant' ? 'model' : 'user',
     parts: [
       {
         text: m.content
@@ -430,7 +408,10 @@ app.post('/api/dubis', async (req, res) => {
   let lastErrorStatus = null;
   let lastErrorText = '';
 
-  // First attempt + automatic retries
+  // Maximum 3 attempts total:
+  // Attempt 1 → wait 1 sec if temporary error
+  // Attempt 2 → wait 2 sec if temporary error
+  // Attempt 3 → final result
   for (
     let attempt = 0;
     attempt <= GEMINI_MAX_RETRIES;
@@ -445,9 +426,8 @@ app.post('/api/dubis', async (req, res) => {
     );
 
     try {
-
       console.log(
-        `[dubis] Gemini request attempt ${attempt + 1}/${GEMINI_MAX_RETRIES + 1}`
+        `[dubis] Gemini attempt ${attempt + 1}/${GEMINI_MAX_RETRIES + 1}`
       );
 
       const upstream = await fetch(url, {
@@ -460,7 +440,6 @@ app.post('/api/dubis', async (req, res) => {
         },
 
         body: JSON.stringify({
-
           systemInstruction: {
             parts: [
               {
@@ -474,15 +453,13 @@ app.post('/api/dubis', async (req, res) => {
           generationConfig: {
             maxOutputTokens: 2048
           }
-
         })
       });
 
       clearTimeout(timeoutId);
 
-      // SUCCESS 🎉
+      // SUCCESS
       if (upstream.ok) {
-
         const data = await upstream.json();
 
         const reply =
@@ -507,8 +484,6 @@ app.post('/api/dubis', async (req, res) => {
         });
       }
 
-
-      // Read error
       const errText =
         await upstream.text().catch(() => '');
 
@@ -520,56 +495,43 @@ app.post('/api/dubis', async (req, res) => {
         errText
       );
 
-
-      // Retry only temporary errors
+      // Only retry temporary problems
       const shouldRetry =
         upstream.status === 503 ||
         upstream.status === 429 ||
         upstream.status >= 500;
 
-
       if (
         shouldRetry &&
         attempt < GEMINI_MAX_RETRIES
       ) {
-
-        // Exponential backoff:
-        // 1st retry = 1 second
-        // 2nd retry = 2 seconds
-        // 3rd retry = 4 seconds
         const delay =
           1000 * Math.pow(2, attempt);
 
         console.log(
-          `[dubis] Retrying Gemini in ${delay}ms...`
+          `[dubis] Retrying in ${delay}ms...`
         );
 
         await sleep(delay);
-
         continue;
       }
 
-
-      // Don't retry permanent errors
       break;
 
     } catch (err) {
-
       clearTimeout(timeoutId);
 
       if (err.name === 'AbortError') {
-
         console.error(
-          `[dubis] Gemini request timed out on attempt ${attempt + 1}`
+          `[dubis] Gemini timed out on attempt ${attempt + 1}`
         );
 
         lastErrorStatus = 504;
         lastErrorText = 'Request timed out';
 
       } else {
-
         console.error(
-          `[dubis] unexpected Gemini error on attempt ${attempt + 1}:`,
+          `[dubis] Gemini error on attempt ${attempt + 1}:`,
           err
         );
 
@@ -577,35 +539,29 @@ app.post('/api/dubis', async (req, res) => {
         lastErrorText = err.message;
       }
 
-
-      // Retry network/time-out errors too
+      // Retry timeout/network errors
       if (attempt < GEMINI_MAX_RETRIES) {
-
         const delay =
           1000 * Math.pow(2, attempt);
 
         console.log(
-          `[dubis] Retrying after error in ${delay}ms...`
+          `[dubis] Retrying in ${delay}ms...`
         );
 
         await sleep(delay);
-
         continue;
       }
     }
   }
 
-
-  // All retries failed
   console.error(
     `[dubis] All Gemini attempts failed. Last status: ${lastErrorStatus}`,
     lastErrorText
   );
 
-
   if (lastErrorStatus === 429) {
     return res.status(429).json({
-      error: 'Dubis is receiving too many requests right now. Please try again in a moment.'
+      error: 'Dubis is busy right now. Please try again in a moment.'
     });
   }
 
@@ -615,12 +571,16 @@ app.post('/api/dubis', async (req, res) => {
     });
   }
 
+  if (lastErrorStatus === 504) {
+    return res.status(504).json({
+      error: 'Dubis is taking longer than expected. Please try again.'
+    });
+  }
+
   return res.status(502).json({
     error: 'The AI service is currently unavailable. Please try again shortly.'
   });
-
 });
-
 
 /* ===========================================================
    HEALTH CHECK
@@ -634,7 +594,6 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-
 /* ===========================================================
    STATIC FRONTEND
 =========================================================== */
@@ -645,7 +604,6 @@ app.use(
   )
 );
 
-
 app.get('*', (req, res) => {
   res.sendFile(
     path.join(
@@ -655,7 +613,6 @@ app.get('*', (req, res) => {
     )
   );
 });
-
 
 /* ===========================================================
    START SERVER
