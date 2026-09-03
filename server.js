@@ -1,8 +1,7 @@
 // Aura Cosmos backend
 // - Proxies Dubis chat requests to Gemini (API key never touches the browser)
 // - Handles signup/login/logout with hashed passwords + httpOnly session cookies
-// - Stores/serves each signed-in user's cloud progress (XP, levels, streaks,
-//   lessons, discoveries, games, badges)
+// - Stores/serves each signed-in user's cloud progress
 
 require('dotenv').config();
 
@@ -23,8 +22,13 @@ const PORT = process.env.PORT || 3000;
 // ===========================================================
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+const GEMINI_MODEL =
+  process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+
 const UPSTREAM_TIMEOUT_MS = 40000;
+
+// Number of additional attempts after the first request
+const GEMINI_MAX_RETRIES = 3;
 
 if (!GEMINI_API_KEY) {
   console.warn(
@@ -38,7 +42,7 @@ app.use(express.json({ limit: '256kb' }));
 app.use(cookieParser());
 
 /* ---------------------------------------------------------
-   Simple in-memory per-IP rate limiters
+   RATE LIMITERS
 ---------------------------------------------------------- */
 
 function createRateLimiter(maxRequests, windowMs) {
@@ -67,8 +71,12 @@ function clientIp(req) {
     'unknown';
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /* ---------------------------------------------------------
-   Validation helpers
+   VALIDATION HELPERS
 ---------------------------------------------------------- */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -86,8 +94,16 @@ function isValidUsername(v) {
 }
 
 function isValidPassword(v) {
-  if (typeof v !== 'string' || v.length < 8 || v.length > 200) return false;
-  return /[a-zA-Z]/.test(v) && /[0-9]/.test(v);
+  if (
+    typeof v !== 'string' ||
+    v.length < 8 ||
+    v.length > 200
+  ) {
+    return false;
+  }
+
+  return /[a-zA-Z]/.test(v) &&
+    /[0-9]/.test(v);
 }
 
 function publicUser(user) {
@@ -104,7 +120,6 @@ function publicUser(user) {
 =========================================================== */
 
 app.post('/api/auth/signup', async (req, res) => {
-
   if (authLimiter(clientIp(req))) {
     return res.status(429).json({
       error: 'Too many attempts. Please wait a minute and try again.'
@@ -112,7 +127,6 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 
   try {
-
     const { username, email, password } = req.body || {};
 
     if (!username || !email || !password) {
@@ -151,7 +165,8 @@ app.post('/api/auth/signup', async (req, res) => {
       });
     }
 
-    const passwordHash = await auth.hashPassword(password);
+    const passwordHash =
+      await auth.hashPassword(password);
 
     const id = crypto.randomUUID();
 
@@ -171,7 +186,6 @@ app.post('/api/auth/signup', async (req, res) => {
     });
 
   } catch (err) {
-
     console.error('[auth/signup] error:', err);
 
     return res.status(500).json({
@@ -182,7 +196,6 @@ app.post('/api/auth/signup', async (req, res) => {
 
 
 app.post('/api/auth/login', async (req, res) => {
-
   if (authLimiter(clientIp(req))) {
     return res.status(429).json({
       error: 'Too many attempts. Please wait a minute and try again.'
@@ -190,7 +203,6 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   try {
-
     const { identifier, password } = req.body || {};
 
     if (!identifier || !password) {
@@ -203,13 +215,15 @@ app.post('/api/auth/login', async (req, res) => {
       ? db.findUserByEmail(identifier)
       : db.findUserByUsername(identifier);
 
-    // Always run a bcrypt compare, even for unknown accounts, using a dummy
-    // hash — otherwise a missing account returns near-instantly while a real
-    // one takes bcrypt's compare time, letting an attacker enumerate valid
-    // emails/usernames purely from response timing despite the generic message.
     const ok = user
-      ? await auth.verifyPassword(password, user.passwordHash)
-      : await auth.verifyPassword(password, auth.DUMMY_HASH);
+      ? await auth.verifyPassword(
+          password,
+          user.passwordHash
+        )
+      : await auth.verifyPassword(
+          password,
+          auth.DUMMY_HASH
+        );
 
     if (!user || !ok) {
       return res.status(401).json({
@@ -226,7 +240,6 @@ app.post('/api/auth/login', async (req, res) => {
     });
 
   } catch (err) {
-
     console.error('[auth/login] error:', err);
 
     return res.status(500).json({
@@ -240,7 +253,6 @@ app.post(
   '/api/auth/logout',
   auth.requireXhrHeader,
   (req, res) => {
-
     auth.clearSessionCookie(res);
 
     res.json({
@@ -251,7 +263,6 @@ app.post(
 
 
 app.get('/api/auth/me', (req, res) => {
-
   const token =
     req.cookies &&
     req.cookies[auth.COOKIE_NAME];
@@ -292,7 +303,6 @@ app.get(
   '/api/progress',
   auth.requireAuth,
   (req, res) => {
-
     if (progressLimiter(clientIp(req))) {
       return res.status(429).json({
         error: 'Too many requests — please slow down a little.'
@@ -311,7 +321,6 @@ app.put(
   auth.requireAuth,
   auth.requireXhrHeader,
   (req, res) => {
-
     if (progressLimiter(clientIp(req))) {
       return res.status(429).json({
         error: 'Too many requests — please slow down a little.'
@@ -331,7 +340,6 @@ app.put(
     }
 
     try {
-
       const saved = db.saveProgress(
         req.userId,
         body
@@ -342,7 +350,6 @@ app.put(
       });
 
     } catch (err) {
-
       console.error('[progress/put] error:', err);
 
       res.status(500).json({
@@ -354,11 +361,10 @@ app.put(
 
 
 /* ===========================================================
-   DUBIS — GEMINI AI PROXY
+   DUBIS — GEMINI AI PROXY WITH AUTOMATIC RETRIES
 =========================================================== */
 
 app.post('/api/dubis', async (req, res) => {
-
   const ip = clientIp(req);
 
   if (dubisLimiter(ip)) {
@@ -392,7 +398,6 @@ app.post('/api/dubis', async (req, res) => {
   }
 
   for (const m of messages) {
-
     if (
       !m ||
       (m.role !== 'user' && m.role !== 'assistant') ||
@@ -405,9 +410,7 @@ app.post('/api/dubis', async (req, res) => {
     }
   }
 
-
-  // Convert Anthropic-style messages to Gemini format
-
+  // Convert frontend messages to Gemini format
   const contents = messages.map(m => ({
     role: m.role === 'assistant'
       ? 'model'
@@ -420,131 +423,201 @@ app.post('/api/dubis', async (req, res) => {
     ]
   }));
 
+  const url =
+    `https://generativelanguage.googleapis.com/v1beta/models/` +
+    `${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
-  const controller = new AbortController();
+  let lastErrorStatus = null;
+  let lastErrorText = '';
 
-  const timeoutId = setTimeout(
-    () => controller.abort(),
-    UPSTREAM_TIMEOUT_MS
-  );
+  // First attempt + automatic retries
+  for (
+    let attempt = 0;
+    attempt <= GEMINI_MAX_RETRIES;
+    attempt++
+  ) {
 
+    const controller = new AbortController();
 
-  try {
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      UPSTREAM_TIMEOUT_MS
+    );
 
-    const url =
-      `https://generativelanguage.googleapis.com/v1beta/models/` +
-      `${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+    try {
 
+      console.log(
+        `[dubis] Gemini request attempt ${attempt + 1}/${GEMINI_MAX_RETRIES + 1}`
+      );
 
-    const upstream = await fetch(url, {
+      const upstream = await fetch(url, {
+        method: 'POST',
 
-      method: 'POST',
+        signal: controller.signal,
 
-      signal: controller.signal,
-
-      headers: {
-        'Content-Type': 'application/json'
-      },
-
-      body: JSON.stringify({
-
-        systemInstruction: {
-          parts: [
-            {
-              text: system
-            }
-          ]
+        headers: {
+          'Content-Type': 'application/json'
         },
 
-        contents,
+        body: JSON.stringify({
 
-        generationConfig: {
-          maxOutputTokens: 2048
+          systemInstruction: {
+            parts: [
+              {
+                text: system
+              }
+            ]
+          },
+
+          contents,
+
+          generationConfig: {
+            maxOutputTokens: 2048
+          }
+
+        })
+      });
+
+      clearTimeout(timeoutId);
+
+      // SUCCESS 🎉
+      if (upstream.ok) {
+
+        const data = await upstream.json();
+
+        const reply =
+          data?.candidates?.[0]?.content?.parts
+            ?.map(part => part.text || '')
+            .join('')
+            .trim();
+
+        if (!reply) {
+          console.error(
+            '[dubis] Gemini returned an unexpected response:',
+            JSON.stringify(data)
+          );
+
+          return res.status(502).json({
+            error: 'The AI service returned an unexpected response.'
+          });
         }
 
-      })
-
-    });
-
-
-    clearTimeout(timeoutId);
+        return res.json({
+          reply
+        });
+      }
 
 
-    if (!upstream.ok) {
-
+      // Read error
       const errText =
         await upstream.text().catch(() => '');
+
+      lastErrorStatus = upstream.status;
+      lastErrorText = errText;
 
       console.error(
         `[dubis] Gemini upstream error ${upstream.status}:`,
         errText
       );
 
-      const status =
-        upstream.status === 429
-          ? 429
-          : 502;
 
-      return res.status(status).json({
-        error: 'The AI service returned an error. Please try again shortly.'
-      });
+      // Retry only temporary errors
+      const shouldRetry =
+        upstream.status === 503 ||
+        upstream.status === 429 ||
+        upstream.status >= 500;
+
+
+      if (
+        shouldRetry &&
+        attempt < GEMINI_MAX_RETRIES
+      ) {
+
+        // Exponential backoff:
+        // 1st retry = 1 second
+        // 2nd retry = 2 seconds
+        // 3rd retry = 4 seconds
+        const delay =
+          1000 * Math.pow(2, attempt);
+
+        console.log(
+          `[dubis] Retrying Gemini in ${delay}ms...`
+        );
+
+        await sleep(delay);
+
+        continue;
+      }
+
+
+      // Don't retry permanent errors
+      break;
+
+    } catch (err) {
+
+      clearTimeout(timeoutId);
+
+      if (err.name === 'AbortError') {
+
+        console.error(
+          `[dubis] Gemini request timed out on attempt ${attempt + 1}`
+        );
+
+        lastErrorStatus = 504;
+        lastErrorText = 'Request timed out';
+
+      } else {
+
+        console.error(
+          `[dubis] unexpected Gemini error on attempt ${attempt + 1}:`,
+          err
+        );
+
+        lastErrorStatus = 500;
+        lastErrorText = err.message;
+      }
+
+
+      // Retry network/time-out errors too
+      if (attempt < GEMINI_MAX_RETRIES) {
+
+        const delay =
+          1000 * Math.pow(2, attempt);
+
+        console.log(
+          `[dubis] Retrying after error in ${delay}ms...`
+        );
+
+        await sleep(delay);
+
+        continue;
+      }
     }
+  }
 
 
-    const data = await upstream.json();
+  // All retries failed
+  console.error(
+    `[dubis] All Gemini attempts failed. Last status: ${lastErrorStatus}`,
+    lastErrorText
+  );
 
 
-    const reply =
-      data?.candidates?.[0]?.content?.parts
-        ?.map(part => part.text || '')
-        .join('')
-        .trim();
-
-
-    if (!reply) {
-
-      console.error(
-        '[dubis] Gemini returned an unexpected response:',
-        JSON.stringify(data)
-      );
-
-      return res.status(502).json({
-        error: 'The AI service returned an unexpected response.'
-      });
-    }
-
-
-    return res.json({
-      reply
-    });
-
-
-  } catch (err) {
-
-    clearTimeout(timeoutId);
-
-
-    if (err.name === 'AbortError') {
-
-      console.error(
-        '[dubis] Gemini request timed out'
-      );
-
-      return res.status(504).json({
-        error: 'The AI service took too long to respond.'
-      });
-    }
-
-
-    console.error(
-      '[dubis] unexpected Gemini server error:',
-      err
-    );
-
-    return res.status(500).json({
-      error: 'Unexpected server error.'
+  if (lastErrorStatus === 429) {
+    return res.status(429).json({
+      error: 'Dubis is receiving too many requests right now. Please try again in a moment.'
     });
   }
+
+  if (lastErrorStatus === 503) {
+    return res.status(503).json({
+      error: 'Dubis is temporarily experiencing high demand. Please try again shortly.'
+    });
+  }
+
+  return res.status(502).json({
+    error: 'The AI service is currently unavailable. Please try again shortly.'
+  });
 
 });
 
@@ -554,12 +627,11 @@ app.post('/api/dubis', async (req, res) => {
 =========================================================== */
 
 app.get('/api/health', (req, res) => {
-
   res.json({
     ok: true,
-    hasApiKey: Boolean(GEMINI_API_KEY)
+    hasApiKey: Boolean(GEMINI_API_KEY),
+    model: GEMINI_MODEL
   });
-
 });
 
 
@@ -575,7 +647,6 @@ app.use(
 
 
 app.get('*', (req, res) => {
-
   res.sendFile(
     path.join(
       __dirname,
@@ -583,7 +654,6 @@ app.get('*', (req, res) => {
       'index.html'
     )
   );
-
 });
 
 
@@ -592,9 +662,7 @@ app.get('*', (req, res) => {
 =========================================================== */
 
 app.listen(PORT, () => {
-
   console.log(
     `Aura Cosmos server listening on http://localhost:${PORT}`
   );
-
 });
