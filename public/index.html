@@ -297,6 +297,7 @@ p.page-sub{color:var(--text-dim);max-width:640px;font-size:14.5px;line-height:1.
   color:var(--text);touch-action:none;}
 .orbit-btn:active, .orbit-btn.active{background:rgba(139,92,246,0.5);border-color:var(--cyan);}
 .orbit-btn.shield.active{background:rgba(34,211,238,0.5);}
+.orbit-btn.fire.active{background:rgba(248,113,113,0.55);border-color:var(--danger);}
 .orbit-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;gap:10px;padding:20px;background:rgba(4,4,12,0.72);backdrop-filter:blur(4px);z-index:5;}
 .orbit-overlay h3{font-family:var(--font-display);font-size:18px;letter-spacing:1px;}
@@ -511,6 +512,86 @@ p.page-sub{color:var(--text-dim);max-width:640px;font-size:14.5px;line-height:1.
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
 footer.foot{text-align:center;padding:26px;color:var(--text-faint);font-size:11px;font-family:var(--font-mono);letter-spacing:1px;position:relative;z-index:2;}
+/* Planet Exploration builds on Aura Cosmos' existing colors, type and glass panels. */
+.ship-entry{min-height:235px;padding:28px 34px;display:flex;align-items:center;justify-content:space-between;gap:20px;overflow:hidden;
+  background:radial-gradient(ellipse at 76% 55%,rgba(34,211,238,.12),transparent 42%),linear-gradient(115deg,rgba(20,18,42,.82),rgba(10,10,28,.72));}
+.ship-entry-copy{position:relative;z-index:1;}
+.ship-entry h2{font-family:var(--font-display);font-size:clamp(19px,3vw,28px);letter-spacing:.7px;margin:5px 0 8px;}
+.ship-entry p{color:var(--text-dim);font-size:14px;margin-bottom:18px;}
+.ship-entry-art{position:relative;width:240px;height:180px;flex:0 0 240px;display:grid;place-items:center;}
+.ship-orbit{position:absolute;border:1px solid rgba(34,211,238,.27);border-radius:50%;transform:rotate(-24deg);}
+.ship-orbit-one{width:208px;height:82px}.ship-orbit-two{width:160px;height:132px;transform:rotate(40deg);border-color:rgba(139,92,246,.35)}
+.ship-window-planet{position:absolute;width:86px;height:86px;border-radius:50%;background:radial-gradient(circle at 30% 28%,#7dd3fc,#2563eb 46%,#11113e 78%);box-shadow:0 0 35px rgba(34,211,238,.34)}
+.ship-rocket{position:relative;z-index:1;font-size:52px;filter:drop-shadow(0 0 14px rgba(232,121,249,.5));transform:rotate(-25deg);animation:shipFloat 4s ease-in-out infinite}
+.ship-star{position:absolute;color:var(--cyan);font-size:20px}.ship-star-one{top:22px;right:25px}.ship-star-two{bottom:26px;left:20px;color:var(--magenta)}.ship-star-three{top:35px;left:30px;font-size:34px;color:var(--gold)}
+@keyframes shipFloat{50%{transform:translate(0,-7px) rotate(-22deg)}}
+.ship-entry-cta{min-height:44px}
+
+.planet-panel{max-width:1260px!important;padding:30px 24px 52px!important;}
+.planet-exp{position:relative;z-index:1;--planet-accent:#22d3ee;}
+.planet-exp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin:8px 54px 20px 0;}
+.planet-exp-title{font-family:var(--font-display);font-size:clamp(22px,3.6vw,34px);letter-spacing:.6px;margin:4px 0 6px;}
+.planet-exp-sub{color:var(--text-dim);font-size:13px;line-height:1.55;max-width:650px;}
+.planet-exp-actions{display:flex;flex-wrap:wrap;gap:8px;}
+.planet-exp .btn.planet-small{min-height:38px;padding:8px 14px;font-size:11px;}
+.planet-cockpit{position:relative;border-radius:20px;overflow:hidden;padding:24px;margin-bottom:24px;min-height:150px;
+  background:radial-gradient(ellipse at 78% 50%,color-mix(in srgb,var(--planet-accent) 22%,transparent),transparent 35%),linear-gradient(115deg,rgba(20,18,42,.92),rgba(5,5,13,.92));}
+.planet-cockpit::after{content:'✦   ·  ✧       ·      ✦';position:absolute;right:20px;top:18px;color:rgba(255,255,255,.45);letter-spacing:20px;pointer-events:none}
+.planet-cockpit h2{font-family:var(--font-display);font-size:clamp(18px,2.8vw,26px);margin:0 0 8px;}
+.planet-cockpit p{max-width:600px;color:var(--text-dim);font-size:13px;line-height:1.6;}
+.planet-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;}
+.planet-card{--planet-color:#38bdf8;padding:16px;border-radius:16px;min-width:0;border:1px solid var(--border);background:rgba(255,255,255,.035);transition:transform .22s ease,border-color .22s ease,background .22s ease;}
+.planet-card:hover{transform:translateY(-3px);border-color:var(--planet-color);background:rgba(255,255,255,.06)}
+.planet-card-visual{height:94px;display:grid;place-items:center;position:relative;margin:-2px 0 10px;overflow:hidden;}
+.planet-card-orb{width:70px;height:70px;border-radius:50%;background:radial-gradient(circle at 32% 28%,color-mix(in srgb,var(--planet-color) 85%,white),var(--planet-color) 46%,#080817 108%);box-shadow:inset -12px -9px 20px rgba(0,0,0,.45),0 0 25px color-mix(in srgb,var(--planet-color) 25%,transparent);position:relative;}
+.planet-card-orb.ringed::after{content:'';position:absolute;width:100px;height:25px;left:-15px;top:24px;border:4px solid color-mix(in srgb,var(--planet-color) 70%,#fff);border-left-color:transparent;border-right-color:transparent;border-radius:50%;transform:rotate(-20deg);}
+.planet-card h3{font-family:var(--font-display);font-size:13px;letter-spacing:.4px;margin-bottom:5px;}
+.planet-card p{min-height:37px;color:var(--text-dim);font-size:11.5px;line-height:1.45;margin-bottom:9px;}
+.planet-card-meta{min-height:32px;color:var(--text-faint);font:10px/1.5 var(--font-mono);margin-bottom:12px;}
+.planet-card .btn{justify-content:center;width:100%;}
+.planet-status{font:10px var(--font-mono);color:var(--good);margin:-3px 0 9px;min-height:12px;}
+.planet-view-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.9fr);gap:16px;align-items:stretch;}
+.planet-visual-panel{position:relative;min-height:440px;border-radius:18px;overflow:hidden;border:1px solid var(--border);background:radial-gradient(ellipse at 50% 54%,rgba(43,36,85,.55),#05050e 65%);touch-action:none;}
+.planet-canvas-host{position:absolute;inset:0;touch-action:none;cursor:grab;}
+.planet-canvas-host:active{cursor:grabbing}
+.planet-canvas-host canvas{width:100%;height:100%;display:block;}
+.planet-canvas-fallback{position:absolute;width:min(60vw,260px);aspect-ratio:1;border-radius:50%;left:50%;top:48%;transform:translate(-50%,-50%);background:radial-gradient(circle at 30% 27%,color-mix(in srgb,var(--planet-accent) 72%,white),var(--planet-accent) 43%,#04040b 88%);box-shadow:inset -34px -22px 44px rgba(0,0,0,.62),0 0 55px color-mix(in srgb,var(--planet-accent) 32%,transparent);touch-action:none;}
+.planet-ring-fallback{position:absolute;width:122%;height:38%;left:-11%;top:32%;border:10px solid rgba(216,195,147,.64);border-left-color:transparent;border-right-color:transparent;border-radius:50%;transform:rotate(-20deg);}
+.planet-fallback-note{position:absolute;inset:auto 18px 42px;text-align:center;color:var(--text-dim);font-size:11px;}
+.planet-view-hud{position:absolute;z-index:3;left:12px;right:12px;top:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;}
+.planet-view-chip{font:10px var(--font-mono);padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(5,5,15,.72);color:var(--text-dim);backdrop-filter:blur(8px);}
+.planet-controls{position:absolute;z-index:4;right:12px;bottom:12px;display:flex;gap:7px;}
+.planet-controls button{width:42px;height:42px;border-radius:50%;border:1px solid var(--border-bright);background:rgba(6,6,16,.82);font-size:17px;backdrop-filter:blur(8px);}
+.planet-controls button:hover,.planet-controls button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+.planet-side{display:flex;flex-direction:column;gap:12px;min-width:0;}
+.planet-info-card,.planet-poi-card,.planet-mission-card{padding:17px;border-radius:16px;}
+.planet-info-card h3,.planet-poi-card h3,.planet-mission-card h3{font-family:var(--font-display);font-size:12px;letter-spacing:.7px;margin:0 0 10px;}
+.planet-info-card>p,.planet-poi-detail{color:var(--text-dim);font-size:12px;line-height:1.6;}
+.planet-fact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0;}
+.planet-fact{padding:8px 9px;border:1px solid rgba(139,92,246,.18);border-radius:10px;background:rgba(255,255,255,.025);min-width:0;}
+.planet-fact span{display:block;font:9px var(--font-mono);letter-spacing:.5px;color:var(--text-faint);margin-bottom:4px;}
+.planet-fact strong{font-size:11px;font-weight:600;overflow-wrap:anywhere;}
+.planet-atmosphere{font-size:11px;color:var(--text-dim);line-height:1.5;}
+.planet-poi-list{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0;}
+.planet-poi-list button{border:1px solid var(--border);background:rgba(255,255,255,.04);padding:8px 10px;border-radius:999px;font-size:10.5px;}
+.planet-poi-list button[aria-pressed=true]{border-color:var(--planet-accent);color:white;background:color-mix(in srgb,var(--planet-accent) 18%,transparent);}
+.planet-poi-detail strong{color:var(--text);display:block;margin-bottom:4px;}
+.planet-learn-link{margin-top:11px;display:inline-flex;}
+.planet-mission-card{border-color:rgba(251,191,36,.25);background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(139,92,246,.06));}
+.planet-mission-card p{color:var(--text-dim);font-size:11.5px;line-height:1.55;margin-bottom:11px;}
+.planet-quiz{display:grid;gap:7px;margin-top:10px;}
+.planet-quiz button{padding:9px 11px;text-align:left;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.04);font-size:11.5px;line-height:1.4;}
+.planet-quiz button:hover,.planet-quiz button:focus-visible{border-color:var(--cyan);outline:none;}
+.planet-quiz-feedback{font-size:11px;line-height:1.5;color:var(--text-dim);margin-top:8px;}
+.planet-sim-note{font:9px/1.5 var(--font-mono);color:var(--text-faint);margin-top:8px;}
+.planet-travel{min-height:44vh;display:grid;place-items:center;text-align:center;padding:25px;}
+.planet-travel-core{max-width:500px}
+.planet-travel-orb{width:120px;height:120px;border-radius:50%;margin:0 auto 24px;background:radial-gradient(circle at 30% 28%,#fff,var(--planet-accent) 35%,#090914 84%);box-shadow:0 0 70px color-mix(in srgb,var(--planet-accent) 60%,transparent);animation:planetTravel .75s ease-in-out infinite alternate;}
+@keyframes planetTravel{to{transform:scale(1.16);box-shadow:0 0 120px color-mix(in srgb,var(--planet-accent) 70%,transparent)}}
+@media(max-width:950px){.planet-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.planet-view-grid{grid-template-columns:1fr}.planet-visual-panel{min-height:390px}.planet-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.planet-info-card{grid-row:span 2}}
+@media(max-width:620px){.ship-entry{padding:23px 19px;min-height:220px}.ship-entry-art{width:125px;height:125px;flex-basis:125px;transform:scale(.75);margin-right:-13px}.ship-entry h2{font-size:19px}.ship-entry p{font-size:12px}.ship-entry .eyebrow{letter-spacing:2px}.planet-panel{padding:24px 13px 38px!important}.planet-exp-top{margin:8px 44px 16px 0}.planet-exp-actions{width:100%}.planet-grid{gap:9px}.planet-card{padding:12px}.planet-card-visual{height:77px}.planet-card-orb{width:58px;height:58px}.planet-card h3{font-size:11px}.planet-card p{font-size:10.5px;min-height:44px}.planet-card-meta{font-size:9px}.planet-card .btn{padding:8px 9px}.planet-side{display:flex}.planet-visual-panel{min-height:340px}.planet-fact-grid{gap:6px}.planet-exp .btn.planet-small{padding:8px 11px}.planet-controls button{width:46px;height:46px}}
+@media(prefers-reduced-motion:reduce){.ship-rocket,.planet-travel-orb{animation:none}.ship-entry-cta{transition:none}}
+
 </style>
 </head>
 <body>
@@ -604,6 +685,8 @@ const DEFAULT_STATE = {
   dailyMystery: null,      // {date, hypothesis, feedback, xp, relevance} — today's Daily Cosmic Mystery attempt
   exploreDiscoveries: [],  // ids of explore modules engaged
   gamesCompleted: [],
+  planetDiscoveries: [],     // planet/feature ids discovered in Planet Exploration
+  planetMissionsCompleted: [],// planet ids with a completed exploration quiz
   badges: [],
   visitedSections: []
 };
@@ -675,6 +758,7 @@ const BADGES = [
   {id:'darkmatter', icon:'🌑', name:'Dark Matter Investigator', check:()=>state.exploreDiscoveries.includes('darkmatter')},
   {id:'mars', icon:'🚀', name:'Mars Commander', check:()=>state.gamesCompleted.includes('mars')},
   {id:'livesky', icon:'🌃', name:'Sky Watcher', check:()=>state.exploreDiscoveries.includes('livesky')},
+  {id:'worldwalker', icon:'🪐', name:'World Walker', check:()=>state.planetMissionsCompleted.length>=8},
   {id:'explorer', icon:'🌌', name:'Cosmic Explorer', check:()=>['home','learn','explore','experience'].every(s=>state.visitedSections.includes(s))},
   {id:'xp100', icon:'🌱', name:'First Steps', check:()=>state.xp>=100},
   {id:'xp500', icon:'🚀', name:'Rising Explorer', check:()=>state.xp>=500},
@@ -744,6 +828,7 @@ function runFsCleanups(){
   if(typeof cleanupSignalGame==='function') cleanupSignalGame();
   if(typeof cleanupOrbitRush==='function') cleanupOrbitRush();
   if(typeof cleanupLiveSky==='function') cleanupLiveSky();
+  if(typeof cleanupPlanetScene==='function') cleanupPlanetScene();
 }
 
 /* ---------------------------------------------------------
@@ -892,6 +977,20 @@ routes.home = function(){
         <div class="go">OPEN LIVE SKY →</div>
       </div>
     </div>
+
+    <section class="home-section ship-entry glass" aria-labelledby="shipEntryTitle">
+      <div class="ship-entry-copy">
+        <div class="eyebrow">Your next journey</div>
+        <h2 id="shipEntryTitle">Get Into Your Spaceship! 🚀</h2>
+        <p>Stop watching the universe. Start exploring it.</p>
+        <button class="btn ship-entry-cta" onclick="launchSpaceship()">Enter Spaceship <span aria-hidden="true">→</span></button>
+      </div>
+      <div class="ship-entry-art" aria-hidden="true">
+        <div class="ship-orbit ship-orbit-one"></div><div class="ship-orbit ship-orbit-two"></div>
+        <div class="ship-window-planet"></div><div class="ship-rocket">🚀</div>
+        <span class="ship-star ship-star-one">✦</span><span class="ship-star ship-star-two">✧</span><span class="ship-star ship-star-three">·</span>
+      </div>
+    </section>
   </div>`;
   initHeroScene();
 };
@@ -5156,10 +5255,11 @@ function openOrbitRush(){
       <div class="orbit-combo" id="orComboOut">COMBO ×1</div>
       <div class="orbit-mobile-controls">
         <div class="orbit-btn shield" id="orShieldBtn">🛡️</div>
+        <div class="orbit-btn fire" id="orFireBtn">🔫</div>
         <div class="orbit-btn boost" id="orBoostBtn">⚡</div>
       </div>
     </div>
-    <div class="sim-note">Desktop: arrow keys / WASD to move, Space to boost, Shift for shield. Mobile: drag to move, tap the buttons to boost or shield. Fly close to a planet (without hitting it) to slingshot for bonus speed and combo.</div>
+    <div class="sim-note">Desktop: arrow keys / WASD to move, Space to boost, Shift for shield, F to fire. Mobile: drag to move, tap the buttons to boost, shield or fire. Enemy ships track and shoot at you — destroy them for big score, or slingshot past planets to escape. Fly close to a planet (without hitting it) for bonus speed and combo.</div>
     <div class="sim-readout">
       <div class="r-box"><div class="k">BEST (DESKTOP)</div><div class="v">${scores.desktop||0}</div></div>
       <div class="r-box"><div class="k">BEST (MOBILE)</div><div class="v">${scores.mobile||0}</div></div>
@@ -5188,7 +5288,8 @@ function initOrbitRush(){
     running:false, gameOver:true, t:0, distance:0, score:0, combo:1, comboTimer:0,
     ship:{x:0.5, y:0.75, vx:0, vy:0, hull:100, fuel:100, shieldCharges:3, shieldActive:false, shieldCooldown:0, invuln:0},
     asteroids:[], planets:[], particles:[], stars:[],
-    spawnTimer:0, planetTimer:2.5,
+    enemies:[], enemyBullets:[], playerBullets:[],
+    spawnTimer:0, planetTimer:2.5, enemyTimer:7, fireHeld:false, fireCooldown:0, enemiesDestroyed:0,
     keys:{}, boostHeld:false, shieldHeld:false,
     pointerActive:false, pointerTarget:null,
     inputMode: isTouchPrimary() ? 'mobile' : 'desktop',
@@ -5205,11 +5306,13 @@ function initOrbitRush(){
     orbitRush.keys[e.key.toLowerCase()] = true;
     if(e.code==='Space'){ orbitRush.boostHeld = true; e.preventDefault(); }
     if(e.key==='Shift'){ orbitRush.shieldHeld = true; }
+    if(e.key.toLowerCase()==='f'){ orbitRush.fireHeld = true; }
   };
   orbitRush.onKeyUp = (e)=>{
     orbitRush.keys[e.key.toLowerCase()] = false;
     if(e.code==='Space') orbitRush.boostHeld = false;
     if(e.key==='Shift') orbitRush.shieldHeld = false;
+    if(e.key.toLowerCase()==='f') orbitRush.fireHeld = false;
   };
   window.addEventListener('keydown', orbitRush.onKeyDown);
   window.addEventListener('keyup', orbitRush.onKeyUp);
@@ -5235,15 +5338,19 @@ function initOrbitRush(){
 
   const boostBtn = document.getElementById('orBoostBtn');
   const shieldBtn = document.getElementById('orShieldBtn');
+  const fireBtn = document.getElementById('orFireBtn');
   const setBoost = (v)=>{ orbitRush.boostHeld = v; boostBtn.classList.toggle('active', v); };
   const setShield = (v)=>{ orbitRush.shieldHeld = v; shieldBtn.classList.toggle('active', v); };
+  const setFire = (v)=>{ orbitRush.fireHeld = v; fireBtn.classList.toggle('active', v); };
   ['pointerdown'].forEach(ev=>{
     boostBtn.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); setBoost(true); });
     shieldBtn.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); setShield(true); });
+    fireBtn.addEventListener(ev, (e)=>{ e.preventDefault(); e.stopPropagation(); setFire(true); });
   });
   ['pointerup','pointerleave','pointercancel'].forEach(ev=>{
     boostBtn.addEventListener(ev, ()=>setBoost(false));
     shieldBtn.addEventListener(ev, ()=>setShield(false));
+    fireBtn.addEventListener(ev, ()=>setFire(false));
   });
 
   showOrbitIntro();
@@ -5277,6 +5384,7 @@ function startOrbitRush(){
     running:true, gameOver:false, t:0, distance:0, score:0, combo:1, comboTimer:0,
     ship:{x:0.5, y:0.75, vx:0, vy:0, hull:100, fuel:100, shieldCharges:3, shieldActive:false, shieldCooldown:0, invuln:1.2},
     asteroids:[], planets:[], particles:[], spawnTimer:0, planetTimer:2.5,
+    enemies:[], enemyBullets:[], playerBullets:[], enemyTimer:7, fireCooldown:0, enemiesDestroyed:0,
     inputMode: isTouchPrimary() ? 'mobile' : 'desktop'
   });
 }
@@ -5287,7 +5395,11 @@ function orDifficulty(){
   return {
     spawnInterval: Math.max(0.28, 1.05 - t*0.006),
     asteroidSpeed: 0.16 + Math.min(0.22, t*0.0022),
-    asteroidSizeVariance: Math.min(1, 0.4 + t*0.01)
+    asteroidSizeVariance: Math.min(1, 0.4 + t*0.01),
+    enemySpawnInterval: Math.max(4.5, 11 - t*0.045),
+    enemySpeed: 0.10 + Math.min(0.12, t*0.0012),
+    enemyFireInterval: Math.max(1.1, 2.6 - t*0.01),
+    enemyBulletSpeed: 0.32 + Math.min(0.18, t*0.0015)
   };
 }
 
@@ -5415,6 +5527,72 @@ function orStep(ts){
     }
   });
 
+  // ---- enemy ships: spawn, track, fire ----
+  o.enemyTimer -= dt;
+  if(o.enemyTimer<=0){
+    o.enemyTimer = diff.enemySpawnInterval;
+    o.enemies.push({
+      x: Math.random()*0.8+0.1, y:-0.06, size:0.032,
+      vy: diff.enemySpeed*(0.85+Math.random()*0.3), hull:2, maxHull:2,
+      fireTimer: 1+Math.random()*1.2, flash:0
+    });
+  }
+  o.enemies.forEach(en=>{
+    const trackAccel = 0.35*dt;
+    const dx = ship.x - en.x;
+    en.vx = Math.max(-0.16, Math.min(0.16, (en.vx||0) + Math.sign(dx)*trackAccel));
+    en.x += en.vx*dt;
+    en.y += en.vy*dt;
+    en.flash = Math.max(0, en.flash-dt*3);
+    en.fireTimer -= dt;
+    if(en.fireTimer<=0 && en.y>0.05 && en.y<0.85){
+      en.fireTimer = diff.enemyFireInterval;
+      const ex=ship.x-en.x, ey=ship.y-en.y, mag=Math.hypot(ex,ey)||1;
+      o.enemyBullets.push({x:en.x, y:en.y, vx:(ex/mag)*diff.enemyBulletSpeed, vy:(ey/mag)*diff.enemyBulletSpeed});
+    }
+    // direct collision with ship
+    const sd = Math.hypot(en.x-ship.x, en.y-ship.y);
+    if(sd < en.size+0.03 && ship.invuln<=0){
+      orTakeHit(28);
+      en.hull = 0;
+    }
+  });
+  o.enemies = o.enemies.filter(en=>en.hull>0 && en.y<1.15);
+
+  // player fire input
+  o.fireCooldown -= dt;
+  if(o.fireHeld && o.fireCooldown<=0){
+    o.fireCooldown = 0.22;
+    o.playerBullets.push({x:ship.x, y:ship.y-0.03, vx:0, vy:-1.3});
+  }
+
+  // player bullets: move, offscreen cull, hit enemies or asteroids
+  o.playerBullets.forEach(b=>{
+    b.x += b.vx*dt; b.y += b.vy*dt;
+    for(const en of o.enemies){
+      if(en.hull<=0) continue;
+      if(Math.hypot(en.x-b.x, en.y-b.y) < en.size+0.012){
+        en.hull -= 1; en.flash = 1; b.y = -2;
+        if(en.hull<=0){
+          orAddScore(45); bumpCombo(); o.enemiesDestroyed++;
+          spawnHitParticles(en.x, en.y, '#fbbf24');
+        }
+        break;
+      }
+    }
+  });
+  o.playerBullets = o.playerBullets.filter(b=>b.y>-0.05 && b.y<1.1);
+
+  // enemy bullets: move, offscreen cull, hit ship
+  o.enemyBullets.forEach(b=>{
+    b.x += b.vx*dt; b.y += b.vy*dt;
+    if(ship.invuln<=0 && Math.hypot(b.x-ship.x, b.y-ship.y) < 0.026){
+      orTakeHit(12);
+      b.y = 2;
+    }
+  });
+  o.enemyBullets = o.enemyBullets.filter(b=>b.y>-0.1 && b.y<1.1 && b.x>-0.1 && b.x<1.1);
+
   // particles (boost trail)
   if(o.boostHeld && ship.fuel>0 && Math.random()<0.6){
     o.particles.push({x:ship.x, y:ship.y+0.02, life:0.4, vy:0.3+Math.random()*0.2, vx:(Math.random()-0.5)*0.1});
@@ -5423,7 +5601,7 @@ function orStep(ts){
   o.particles = o.particles.filter(pt=>pt.life>0);
 
   // passive score for distance
-  o.score = Math.round(o.distance * o.combo * 0.4);
+  o.score = Math.round(o.distance * o.combo * 0.4) + o.enemiesDestroyed*45;
 
   updateOrbitHud();
 
@@ -5570,13 +5748,13 @@ function orDraw(){
   });
   ctx.globalAlpha = 1;
 
-  // ship
+  // ship — sized and shaped like an actual rocket (nose cone, hull, fins, engine flame)
   const ship = orbitRush.ship;
   const sx = ship.x*w, sy = ship.y*h;
   const blink = ship.invuln>0 && Math.floor(orbitRush.t*12)%2===0;
   if(!blink){
     if(ship.shieldActive){
-      ctx.beginPath(); ctx.arc(sx,sy,16,0,Math.PI*2);
+      ctx.beginPath(); ctx.arc(sx,sy,24,0,Math.PI*2);
       ctx.strokeStyle='rgba(34,211,238,0.8)'; ctx.lineWidth=2;
       ctx.shadowColor='rgba(34,211,238,0.8)'; ctx.shadowBlur=10;
       ctx.stroke(); ctx.shadowBlur=0;
@@ -5585,13 +5763,57 @@ function orDraw(){
     ctx.translate(sx,sy);
     const angle = Math.atan2(ship.vy, ship.vx||0.001);
     ctx.rotate((orbitRush.pointerActive||Math.hypot(ship.vx,ship.vy)>0.02) ? angle+Math.PI/2 : 0);
+
+    // engine flame (drawn first, behind the hull)
+    const boosting = orbitRush.boostHeld && ship.fuel>0;
+    const flicker = Math.sin(orbitRush.t*42)*2 + Math.sin(orbitRush.t*77)*1.2;
+    const flameLen = (boosting ? 15 : 7) + flicker;
+    const flameW = boosting ? 5.5 : 3.6;
+    const flameGrad = ctx.createLinearGradient(0,10,0,10+Math.max(4,flameLen));
+    flameGrad.addColorStop(0, boosting ? 'rgba(255,255,255,0.95)' : 'rgba(251,191,36,0.9)');
+    flameGrad.addColorStop(0.55, boosting ? 'rgba(34,211,238,0.85)' : 'rgba(249,115,22,0.8)');
+    flameGrad.addColorStop(1, 'rgba(139,92,246,0)');
     ctx.beginPath();
-    ctx.moveTo(0,-11); ctx.lineTo(8,9); ctx.lineTo(0,4); ctx.lineTo(-8,9);
+    ctx.moveTo(-flameW,10);
+    ctx.quadraticCurveTo(0, 10+Math.max(4,flameLen)*1.15, flameW, 10);
+    ctx.closePath();
+    ctx.fillStyle = flameGrad;
+    ctx.fill();
+
+    // fins
+    ctx.fillStyle = '#8b5cf6';
+    ctx.beginPath(); ctx.moveTo(4.5,3); ctx.lineTo(12,13); ctx.lineTo(4.5,9.5); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-4.5,3); ctx.lineTo(-12,13); ctx.lineTo(-4.5,9.5); ctx.closePath(); ctx.fill();
+
+    // hull (nose cone + body)
+    ctx.beginPath();
+    ctx.moveTo(0,-20);
+    ctx.lineTo(4.6,-8);
+    ctx.lineTo(4.6,10);
+    ctx.lineTo(-4.6,10);
+    ctx.lineTo(-4.6,-8);
     ctx.closePath();
     ctx.fillStyle = '#e9e7f7';
-    ctx.shadowColor = 'rgba(139,92,246,0.8)'; ctx.shadowBlur = 8;
+    ctx.shadowColor = 'rgba(139,92,246,0.85)'; ctx.shadowBlur = 11;
     ctx.fill();
     ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(10,10,20,0.35)'; ctx.lineWidth = 0.7; ctx.stroke();
+
+    // nose cone accent band
+    ctx.beginPath();
+    ctx.moveTo(0,-20); ctx.lineTo(4.6,-8); ctx.lineTo(-4.6,-8);
+    ctx.closePath();
+    ctx.fillStyle = '#f87171';
+    ctx.fill();
+
+    // cockpit window
+    ctx.beginPath();
+    ctx.arc(0,-2,2.6,0,Math.PI*2);
+    ctx.fillStyle = '#22d3ee';
+    ctx.shadowColor = 'rgba(34,211,238,0.9)'; ctx.shadowBlur = 7;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
     ctx.restore();
   }
 
@@ -6225,6 +6447,204 @@ function updateSyncIndicator(){
     text.textContent = `Cloud sync active · last synced ${t}`;
   }
 }
+
+/* Planet Exploration: uses the app's router, fullscreen shell, Three.js and XP. */
+const PLANET_DESTINATIONS = [
+  {id:'mercury',name:'Mercury',type:'Terrestrial planet',color:'#b9a58f',diameter:'4,879 km',mass:'3.30 × 10²³ kg',gravity:'3.7 m/s²',distance:'57.9 million km',rotation:'58.6 Earth days',year:'88 Earth days',temperature:'−180 to 430°C',moons:'0',atmosphere:'A very thin exosphere, mostly oxygen, sodium, hydrogen, helium and potassium.',summary:'A cratered world with an enormous day–night temperature swing, racing close to the Sun.',environment:'Mercury has no substantial atmosphere to retain heat. Its surface is rocky, ancient and heavily cratered.',surface:'#b9a58f',mission:'Find a major impact basin and learn why Mercury’s surface can be so hot by day and so cold at night.',quiz:{q:'Why does Mercury have such extreme day–night temperatures?',options:['Its thin exosphere cannot hold much heat','It is the hottest planet at every location','Its orbit stops it rotating'],answer:0,explain:'With almost no atmosphere to move and retain heat, the sunlit ground becomes very hot while the night side loses heat rapidly.'},pois:[
+    {name:'Caloris Basin',what:'A vast impact basin about 1,550 km across, formed by an ancient collision.',why:'Its fractured terrain gives scientists clues about how a large impact affected Mercury’s crust.',fact:'The basin was imaged in detail by NASA’s MESSENGER spacecraft.'},
+    {name:'Discovery Rupes',what:'A long lobate scarp, a cliff-like landform formed as Mercury’s interior cooled and the planet contracted.',why:'It is evidence that Mercury shrank as its interior cooled.',fact:'The scarp is hundreds of kilometres long and cuts across older terrain.'},
+    {name:'Polar craters',what:'Deep craters near Mercury’s poles whose floors stay in permanent shadow.',why:'Water ice can persist in some of these cold traps despite Mercury’s proximity to the Sun.',fact:'Radar observations and MESSENGER data support deposits in permanently shadowed regions.'}
+  ]},
+  {id:'venus',name:'Venus',type:'Terrestrial planet',color:'#e5b875',diameter:'12,104 km',mass:'4.87 × 10²⁴ kg',gravity:'8.87 m/s²',distance:'108.2 million km',rotation:'243 Earth days (retrograde)',year:'224.7 Earth days',temperature:'About 465°C at the surface',moons:'0',atmosphere:'Very dense, mostly carbon dioxide, with clouds of sulfuric-acid droplets.',summary:'A rocky planet hidden beneath bright clouds, with crushing pressure and a scorching surface.',environment:'Venus’s thick atmosphere traps heat through an intense greenhouse effect. Surface pressure is about 92 times Earth’s sea-level pressure.',surface:'#e5b875',mission:'Discover why a cloud-covered planet can still have an intensely hot surface.',quiz:{q:'What is the main reason Venus is hotter at the surface than Mercury?',options:['Its dense atmosphere traps heat','It is closer to the Sun','Its surface is made of metal'],answer:0,explain:'Venus’s dense carbon-dioxide atmosphere traps outgoing heat through a powerful greenhouse effect.'},pois:[
+    {name:'Maat Mons',what:'A large shield volcano rising about 8 km above Venus’s mean planetary radius.',why:'It is one of the clearest volcanic landmarks mapped by radar.',fact:'Radar-bright flows on Venus indicate widespread volcanic resurfacing.'},
+    {name:'Maxwell Montes',what:'The highest mountain range on Venus, rising about 11 km above the mean radius.',why:'It demonstrates that Venus has major highland terrain despite its smooth-looking clouds.',fact:'Its radar appearance is unusually bright, likely due to material or conditions at high altitude.'},
+    {name:'Aphrodite Terra',what:'A broad highland region near Venus’s equator, roughly the size of Africa.',why:'Its complex tessera terrain helps researchers investigate Venus’s crust and geological history.',fact:'The surface is mapped with radar because visible light cannot penetrate the global cloud deck.'}
+  ]},
+  {id:'earth',name:'Earth',type:'Terrestrial planet · our home',color:'#3285d3',diameter:'12,742 km',mass:'5.97 × 10²⁴ kg',gravity:'9.81 m/s²',distance:'149.6 million km',rotation:'23 h 56 min',year:'365.25 days',temperature:'About 15°C global mean',moons:'1',atmosphere:'Mostly nitrogen (78%) and oxygen (21%), with water vapour and trace gases.',summary:'A dynamic ocean world with liquid water on its surface and a protective atmosphere.',environment:'Earth’s oceans, active geology, magnetic field and atmosphere shape a diverse and habitable surface.',surface:'#3285d3',mission:'Choose a natural feature and connect it to one of the processes that continually changes Earth.',quiz:{q:'Which gas makes up most of Earth’s atmosphere?',options:['Oxygen','Nitrogen','Carbon dioxide'],answer:1,explain:'Nitrogen makes up about 78% of dry air; oxygen is about 21%.'},pois:[
+    {name:'Pacific Ocean',what:'The largest and deepest ocean basin on Earth.',why:'The ocean stores heat, drives weather and supports a large share of marine life.',fact:'The Mariana Trench lies in the western Pacific.'},
+    {name:'Himalaya',what:'A mountain range formed where the Indian and Eurasian tectonic plates converge.',why:'Its uplift shows that Earth’s crust is still moving and reshaping the surface.',fact:'The range includes Mount Everest, Earth’s highest mountain above sea level.'},
+    {name:'East African Rift',what:'A developing continental rift system where parts of the African Plate are pulling apart.',why:'It offers a real-time view of processes that can create new ocean basins.',fact:'Rifting is accompanied by earthquakes and volcanism in several regions.'}
+  ]},
+  {id:'mars',name:'Mars',type:'Terrestrial planet',color:'#c75d3d',diameter:'6,779 km',mass:'6.42 × 10²³ kg',gravity:'3.71 m/s²',distance:'227.9 million km',rotation:'24 h 37 min',year:'687 Earth days',temperature:'About −65°C global mean',moons:'2 · Phobos and Deimos',atmosphere:'Thin, mostly carbon dioxide, with nitrogen and argon.',summary:'A cold desert world with giant volcanoes, vast canyons and a rich record of ancient water.',environment:'Mars has a thin atmosphere and a surface shaped by impacts, volcanoes, wind and ancient flowing water.',surface:'#c75d3d',mission:'Locate a major surface feature and connect it to Mars’s geological past.',quiz:{q:'Which Martian feature is the largest volcano in the Solar System?',options:['Olympus Mons','Valles Marineris','Jezero Crater'],answer:0,explain:'Olympus Mons is a giant shield volcano about 22 km high, measured from its surrounding plains.'},pois:[
+    {name:'Olympus Mons',what:'A vast shield volcano about 22 km high and roughly 600 km across.',why:'Its size reveals long-lived volcanic activity under conditions that allowed lava to build up without Earth-like plate motion.',fact:'It is the largest known volcano in the Solar System.'},
+    {name:'Valles Marineris',what:'A canyon system stretching more than 4,000 km along Mars’s equator.',why:'Its scale and geology record major crustal processes and later erosion.',fact:'In places, its relief reaches several kilometres from rim to floor.'},
+    {name:'Jezero Crater',what:'An impact crater with an ancient river delta, explored by NASA’s Perseverance rover.',why:'Delta deposits can preserve clues about past water and potentially habitable environments.',fact:'Perseverance collected rock cores here for possible future return to Earth.'},
+    {name:'Polar caps',what:'Seasonal and residual caps made of water ice and carbon dioxide ice.',why:'They exchange material with the atmosphere and preserve climate records.',fact:'The caps grow and shrink as carbon dioxide freezes and sublimates with the seasons.'}
+  ]},
+  {id:'jupiter',name:'Jupiter',type:'Gas giant',color:'#d4a174',diameter:'139,820 km',mass:'1.90 × 10²⁷ kg',gravity:'24.79 m/s²',distance:'778.6 million km',rotation:'About 9 h 56 min',year:'11.86 Earth years',temperature:'About −110°C at cloud tops',moons:'115 officially recognized (NASA, Aug 2026)',atmosphere:'Mostly hydrogen and helium, with ammonia, water and other compounds in clouds.',summary:'The Solar System’s largest planet, a deep atmosphere of bands, jets and long-lived storms.',environment:'Jupiter has no solid surface to stand on. Its cloud tops and interior extend through increasingly hot, dense layers.',surface:'#d4a174',mission:'Spot the Great Red Spot and learn how a storm can persist in a rapidly rotating atmosphere.',quiz:{q:'What is the Great Red Spot?',options:['A giant long-lived storm','A solid mountain','A circular impact crater'],answer:0,explain:'The Great Red Spot is a giant anticyclonic storm in Jupiter’s atmosphere, observed for centuries.'},pois:[
+    {name:'Great Red Spot',what:'A giant anticyclonic storm in Jupiter’s atmosphere.',why:'It provides a natural laboratory for studying atmospheric circulation and storm dynamics.',fact:'It has been observed for centuries, though its size and shape change over time.'},
+    {name:'Equatorial cloud bands',what:'Alternating light zones and darker belts shaped by powerful east–west jet streams.',why:'Their patterns reveal the planet’s fast rotation and complex atmospheric flow.',fact:'The visible cloud layers are made of different compounds at different altitudes.'},
+    {name:'Galilean moons',what:'Io, Europa, Ganymede and Callisto, the four largest moons of Jupiter.',why:'They are worlds in their own right, including volcanic Io and icy, ocean-candidate Europa.',fact:'Galileo observed these moons in 1610, providing early evidence that not everything orbits Earth.'}
+  ]},
+  {id:'saturn',name:'Saturn',type:'Gas giant',color:'#d9c69a',diameter:'116,460 km',mass:'5.68 × 10²⁶ kg',gravity:'10.44 m/s²',distance:'1.43 billion km',rotation:'About 10 h 33 min',year:'29.4 Earth years',temperature:'About −140°C at cloud tops',moons:'293 officially recognized (NASA, Aug 2026)',atmosphere:'Mostly hydrogen and helium, with clouds and trace compounds.',summary:'A gas giant encircled by bright rings made from countless pieces of mostly water ice.',environment:'Saturn has no solid surface. Its rings span a vast distance but are remarkably thin compared with their width.',surface:'#d9c69a',mission:'Explore the rings and discover the small moons that help shape their gaps and edges.',quiz:{q:'What are Saturn’s rings made mostly of?',options:['Water-ice particles and rocky debris','A solid sheet of ice','Gas clouds'],answer:0,explain:'Saturn’s rings consist of countless particles, mostly water ice, ranging from dust-sized grains to larger chunks.'},pois:[
+    {name:'Main rings',what:'The A, B and C rings are broad bands of countless icy particles orbiting Saturn.',why:'Ring gaps, waves and edges reveal gravitational interactions and orbital resonances.',fact:'The main rings are extremely thin compared with their tens of thousands of kilometres of radial span.'},
+    {name:'Cassini Division',what:'A prominent gap between Saturn’s A and B rings, containing sparse material rather than being empty.',why:'Its structure is linked to orbital resonances with Saturn’s moon Mimas.',fact:'NASA’s Cassini spacecraft studied the rings and their dynamics in detail.'},
+    {name:'Enceladus',what:'A small icy moon that sprays water-rich plumes from fractures near its south pole.',why:'The plumes provide evidence for a subsurface ocean and make the moon a key astrobiology target.',fact:'Cassini sampled material from the plumes during flybys.'}
+  ]},
+  {id:'uranus',name:'Uranus',type:'Ice giant',color:'#71c6ce',diameter:'50,724 km',mass:'8.68 × 10²⁵ kg',gravity:'8.69 m/s²',distance:'2.87 billion km',rotation:'About 17 h 14 min · retrograde',year:'84 Earth years',temperature:'About −195°C at cloud tops',moons:'29 officially recognized (NASA, Aug 2026)',atmosphere:'Hydrogen and helium with methane; deeper layers contain water, ammonia and other volatiles.',summary:'A pale blue-green ice giant that rotates on its side, giving it unusual seasons.',environment:'Uranus has rings and a cold atmosphere. Its extreme axial tilt means each pole can experience decades of sunlight or darkness.',surface:'#71c6ce',mission:'Investigate the planet’s extreme tilt and why it changes the pattern of sunlight over its long year.',quiz:{q:'What makes Uranus’s seasons especially extreme?',options:['Its axis is tilted about 98°','It has no atmosphere','It is closest to the Sun'],answer:0,explain:'Uranus’s rotation axis is tipped by about 98 degrees, so it effectively spins on its side as it orbits the Sun.'},pois:[
+    {name:'Extreme axial tilt',what:'Uranus’s rotation axis is tilted by about 98° relative to its orbit.',why:'The tilt produces unusual seasonal illumination and offers clues to a dramatic early history.',fact:'Each Uranian season lasts about 21 Earth years.'},
+    {name:'Uranian rings',what:'A system of narrow, dark rings around the planet.',why:'The rings help scientists study how small particles interact and remain confined.',fact:'Voyager 2 discovered Uranus’s rings in 1977 through stellar occultations.'},
+    {name:'Miranda',what:'A small icy moon with cliffs, grooves and patchwork terrain.',why:'Its varied surface may record a complex geological history.',fact:'Voyager 2 captured the only close-up images of Miranda during its 1986 flyby.'}
+  ]},
+  {id:'neptune',name:'Neptune',type:'Ice giant',color:'#4167d5',diameter:'49,244 km',mass:'1.02 × 10²⁶ kg',gravity:'11.15 m/s²',distance:'4.50 billion km',rotation:'About 16 h 6 min',year:'164.8 Earth years',temperature:'About −200°C at cloud tops',moons:'16 officially recognized (NASA)',atmosphere:'Hydrogen and helium with methane; deeper layers include water and ammonia.',summary:'A distant blue ice giant with fast winds, changing storms and a large captured moon.',environment:'Neptune’s visible atmosphere is cold and dynamic. The planet radiates more energy than it receives from sunlight.',surface:'#4167d5',mission:'Investigate a changing storm and learn why Neptune’s weather remains energetic so far from the Sun.',quiz:{q:'Which large moon orbits Neptune in a backwards direction?',options:['Triton','Nereid','Proteus'],answer:0,explain:'Triton orbits Neptune in a retrograde direction, strong evidence that it was captured rather than forming in place.'},pois:[
+    {name:'Great Dark Spot',what:'A large, dark storm system observed by Voyager 2 in 1989.',why:'It showed that Neptune’s atmosphere can host huge, changing storms.',fact:'Unlike Jupiter’s Great Red Spot, this storm had disappeared by later Hubble observations.'},
+    {name:'Fast wind bands',what:'Atmospheric jets with winds measured up to around 2,000 km/h.',why:'They show that strong atmospheric circulation can persist despite weak sunlight.',fact:'Neptune radiates more internal heat than it receives from the Sun.'},
+    {name:'Triton',what:'Neptune’s largest moon, moving in a retrograde orbit.',why:'Its backwards orbit suggests Triton was captured and has altered Neptune’s satellite system.',fact:'Voyager 2 observed active nitrogen geysers on Triton in 1989.'}
+  ]}
+];
+
+let planetScene = null;
+let planetTravelTimer = null;
+let planetSelectedPoi = 0;
+let planetQuizFeedback = '';
+
+function planetVisitedCount(){return new Set((state.planetMissionsCompleted||[])).size;}
+function launchSpaceship(){markVisited('planetExploration');renderShipCockpit();}
+function planetColorHex(id){return PLANET_DESTINATIONS.find(p=>p.id===id)?.color||'#22d3ee';}
+function planetName(id){return PLANET_DESTINATIONS.find(p=>p.id===id)?.name||'planet';}
+function setupPlanetPanel(){const panel=document.getElementById('fsPanel');if(panel)panel.classList.add('planet-panel');}
+function openPlanetStage(html){cleanupPlanetScene();clearTimeout(planetTravelTimer);openFullscreen(html);setupPlanetPanel();}
+
+function renderShipCockpit(){
+  const completeCount=planetVisitedCount();
+  const html=`<section class="planet-exp" aria-labelledby="planetCockpitTitle">
+    <header class="planet-exp-top"><div><div class="eyebrow">Aura Cosmos · flight deck</div><h1 class="planet-exp-title" id="planetCockpitTitle">Spaceship mission interface</h1><p class="planet-exp-sub">Choose a destination. Each world has a compact field guide, real features to discover and an optional science mission.</p></div><div class="planet-exp-actions"><button class="btn ghost planet-small" onclick="closeFullscreen()">← Return to Aura Cosmos</button></div></header>
+    <div class="planet-cockpit"><h2>🚀 Mission control, your ship is ready.</h2><p>Solar system navigation online · ${completeCount}/8 planet missions completed · XP is added to your existing Aura Cosmos progress.</p></div>
+    <div class="planet-grid" aria-label="Choose a destination">${PLANET_DESTINATIONS.map((p,i)=>`<article class="planet-card" style="--planet-color:${p.color}"><div class="planet-card-visual"><div class="planet-card-orb ${p.id==='saturn'?'ringed':''}" aria-hidden="true"></div></div><h3>${p.name}</h3><p>${p.summary}</p><div class="planet-card-meta">${p.type}<br>Mean distance · ${p.distance}</div><div class="planet-status">${(state.planetMissionsCompleted||[]).includes(p.id)?'✓ MISSION COMPLETE':''}</div><button class="btn small" onclick="travelToPlanet('${p.id}')" aria-label="Travel to ${p.name}">Explore ${i===0?'destination':'planet'} →</button></article>`).join('')}</div>
+    <p class="planet-sim-note">Planet illustrations and surface views are educational simulations. They are not geographic maps or to scale.</p>
+  </section>`;
+  openPlanetStage(html);
+}
+
+function travelToPlanet(id){
+  const p=PLANET_DESTINATIONS.find(item=>item.id===id);if(!p)return;
+  const accent=p.color;
+  openPlanetStage(`<section class="planet-exp planet-travel" style="--planet-accent:${accent}"><div class="planet-travel-core"><div class="eyebrow">Trajectory locked · ${p.name}</div><div class="planet-travel-orb" aria-hidden="true"></div><h1 class="planet-exp-title">Arriving at ${p.name}</h1><p class="planet-exp-sub">The planetary field guide will be ready in a moment.</p><button class="btn ghost planet-small" onclick="showPlanet('${p.id}')">Skip travel →</button></div></section>`);
+  planetTravelTimer=setTimeout(()=>showPlanet(id),750);
+}
+
+function planetPoiClick(id,index){
+  const p=PLANET_DESTINATIONS.find(item=>item.id===id);if(!p||!p.pois[index])return;
+  planetSelectedPoi=index;planetQuizFeedback='';
+  const key=`${id}:${index}`;
+  if(!(state.planetDiscoveries||[]).includes(key)){
+    state.planetDiscoveries=state.planetDiscoveries||[];state.planetDiscoveries.push(key);saveState();addXP(8,`${p.name} discovery`);
+  }
+  showPlanet(id,false);
+}
+
+function openPlanetLearn(){closeFullscreen();setTimeout(()=>go('learn'),280);}
+function openMarsPlanner(){closeFullscreen();setTimeout(()=>openMarsMission(),280);}
+
+function answerPlanetQuiz(id,index){
+  const p=PLANET_DESTINATIONS.find(item=>item.id===id);if(!p)return;
+  const feedback=document.getElementById('planetQuizFeedback');if(!feedback)return;
+  if(index===p.quiz.answer){
+    if(!(state.planetMissionsCompleted||[]).includes(id)){
+      state.planetMissionsCompleted=state.planetMissionsCompleted||[];state.planetMissionsCompleted.push(id);saveState();addXP(30,`${p.name} mission complete`);checkBadges();
+    }
+    planetQuizFeedback=`Correct — ${p.quiz.explain}`;
+    feedback.textContent=planetQuizFeedback;feedback.style.color='var(--good)';
+    const card=feedback.closest('.planet-mission-card');if(card){card.querySelector('h3').textContent='Mission complete ✓';const buttons=card.querySelectorAll('.planet-quiz button');buttons.forEach(b=>b.disabled=true);}
+  }else{
+    planetQuizFeedback='Not quite. Try again, or inspect the field notes above.';
+    feedback.textContent=planetQuizFeedback;feedback.style.color='var(--gold)';
+  }
+}
+
+function showPlanet(id,resetPoi=true){
+  const p=PLANET_DESTINATIONS.find(item=>item.id===id);if(!p)return;
+  if(resetPoi)planetSelectedPoi=0;
+  const poi=p.pois[planetSelectedPoi]||p.pois[0];
+  const complete=(state.planetMissionsCompleted||[]).includes(id);
+  const data=`<div class="planet-fact-grid">
+    <div class="planet-fact"><span>DIAMETER</span><strong>${p.diameter}</strong></div><div class="planet-fact"><span>MASS</span><strong>${p.mass}</strong></div>
+    <div class="planet-fact"><span>GRAVITY</span><strong>${p.gravity}</strong></div><div class="planet-fact"><span>FROM SUN</span><strong>${p.distance}</strong></div>
+    <div class="planet-fact"><span>ROTATION</span><strong>${p.rotation}</strong></div><div class="planet-fact"><span>ORBIT</span><strong>${p.year}</strong></div>
+    <div class="planet-fact"><span>TEMPERATURE</span><strong>${p.temperature}</strong></div><div class="planet-fact"><span>KNOWN MOONS</span><strong>${p.moons}</strong></div>
+  </div><div class="planet-atmosphere"><b>Atmosphere:</b> ${p.atmosphere}</div><p style="margin-top:9px">${p.environment}</p>`;
+  const quiz=complete?`<p>Mission completed. Your progress and XP are saved with your Aura Cosmos profile.</p><div class="planet-quiz-feedback" id="planetQuizFeedback">${planetQuizFeedback||'Discovery logged · Return to the flight deck or keep exploring.'}</div>`:
+    `<p>${p.quiz.q}</p><div class="planet-quiz">${p.quiz.options.map((o,i)=>`<button onclick="answerPlanetQuiz('${id}',${i})">${o}</button>`).join('')}</div><div class="planet-quiz-feedback" id="planetQuizFeedback">${planetQuizFeedback}</div>`;
+  const marsLink=id==='mars'?`<button class="btn ghost small planet-learn-link" onclick="openMarsPlanner()">Open Mars Mission Planner →</button>`:'';
+  const html=`<section class="planet-exp" style="--planet-accent:${p.color}" aria-labelledby="planetViewTitle">
+    <header class="planet-exp-top"><div><div class="eyebrow">Planet exploration · field mission</div><h1 class="planet-exp-title" id="planetViewTitle">${p.name}</h1><p class="planet-exp-sub">${p.summary}</p></div><div class="planet-exp-actions"><button class="btn ghost planet-small" onclick="renderShipCockpit()">← Destination list</button><button class="btn ghost planet-small" onclick="closeFullscreen()">Exit exploration</button></div></header>
+    <div class="planet-view-grid">
+      <div class="planet-visual-panel" aria-label="Interactive educational simulation of ${p.name}">
+        <div class="planet-view-hud"><span class="planet-view-chip">${p.name.toUpperCase()} · ${p.type.toUpperCase()}</span><span class="planet-view-chip" id="planetRenderStatus">INITIALIZING VIEW</span></div>
+        <div class="planet-canvas-host" id="planetCanvasHost" tabindex="0" role="img" aria-label="Interactive 3D simulation of ${p.name}. Drag to rotate, use the mouse wheel or zoom buttons, and use arrow keys to rotate. Home resets the view."></div>
+        <div class="planet-controls"><button aria-label="Zoom in" title="Zoom in" onclick="adjustPlanetZoom(-.65)">＋</button><button aria-label="Zoom out" title="Zoom out" onclick="adjustPlanetZoom(.65)">−</button><button aria-label="Reset planet view" title="Reset view" onclick="resetPlanetView()">↺</button></div>
+      </div>
+      <aside class="planet-side">
+        <section class="glass planet-info-card"><h3>FIELD NOTES · ${p.type.toUpperCase()}</h3><p>${p.summary}</p>${data}</section>
+        <section class="glass planet-poi-card"><h3>DISCOVER A FEATURE</h3><p class="planet-exp-sub">Select a real planetary feature or region.</p><div class="planet-poi-list" role="group" aria-label="Points of interest">${p.pois.map((item,i)=>`<button aria-pressed="${i===planetSelectedPoi}" onclick="planetPoiClick('${id}',${i})">${item.name}</button>`).join('')}</div><div class="planet-poi-detail"><strong>${poi.name}</strong>${poi.what}<br><br><b>Why it matters:</b> ${poi.why}<br><br><b>Field fact:</b> ${poi.fact}</div><button class="btn ghost small planet-learn-link" onclick="openPlanetLearn()">Continue learning in Learn →</button>${marsLink}</section>
+        <section class="glass planet-mission-card"><h3>${complete?'MISSION COMPLETE ✓':'OPTIONAL SCIENCE MISSION · +30 XP'}</h3>${quiz}</section>
+      </aside>
+    </div>
+    <p class="planet-sim-note">Educational simulation: sphere rotation is interactive, but sizes, terrain and feature positions are not geographically exact. Facts are rounded; giant planets have no solid surface.</p>
+  </section>`;
+  openPlanetStage(html);initPlanetScene(p);
+}
+
+function makePlanetTexture(p){
+  const canvas=document.createElement('canvas');canvas.width=512;canvas.height=256;
+  const ctx=canvas.getContext('2d');ctx.fillStyle=p.color;ctx.fillRect(0,0,512,256);
+  const bands={jupiter:18,saturn:14,uranus:8,neptune:10,venus:12}[p.id]||0;
+  if(bands){for(let y=0;y<256;y+=256/bands){ctx.fillStyle=(Math.floor(y/(256/bands))%2)?'rgba(25,28,52,.17)':'rgba(255,230,185,.17)';ctx.fillRect(0,y,512,256/bands*.64);}}
+  if(p.id==='jupiter'){ctx.fillStyle='rgba(175,67,48,.88)';ctx.beginPath();ctx.ellipse(350,130,40,19,-.1,0,Math.PI*2);ctx.fill();ctx.strokeStyle='rgba(255,220,170,.55)';ctx.lineWidth=3;ctx.stroke();}
+  if(['mercury','mars'].includes(p.id)){let seed=p.id==='mars'?421:991;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};for(let i=0;i<110;i++){const x=rand()*512,y=rand()*256,r=2+rand()*11;ctx.beginPath();ctx.ellipse(x,y,r,r*.55,rand()*Math.PI,0,Math.PI*2);ctx.fillStyle='rgba(20,15,18,.18)';ctx.fill();ctx.beginPath();ctx.arc(x-r*.2,y-r*.16,r*.68,0,Math.PI*2);ctx.strokeStyle='rgba(255,235,210,.16)';ctx.lineWidth=1.4;ctx.stroke();}}
+  if(p.id==='earth'){
+    ctx.fillStyle='rgba(53,132,79,.95)';
+    const land=[[[45,47],[68,28],[92,34],[111,52],[101,77],[86,88],[78,120],[59,105],[54,80]],[[127,125],[146,133],[157,158],[151,185],[140,214],[126,193],[122,164]],[[219,43],[246,31],[270,39],[293,34],[311,50],[340,57],[363,72],[350,96],[324,92],[302,109],[278,96],[261,111],[242,87],[219,81]],[[286,120],[313,126],[324,149],[312,177],[296,191],[285,167],[273,145]],[[371,173],[396,162],[420,171],[411,194],[388,204],[371,192]]];
+    land.forEach(poly=>{ctx.beginPath();poly.forEach((pt,i)=>i?ctx.lineTo(pt[0],pt[1]):ctx.moveTo(pt[0],pt[1]));ctx.closePath();ctx.fill();});
+  }
+  const texture=new THREE.CanvasTexture(canvas);texture.encoding=THREE.sRGBEncoding;texture.anisotropy=2;return texture;
+}
+
+function initPlanetScene(p){
+  const host=document.getElementById('planetCanvasHost');if(!host)return;
+  let renderer,scene,camera,mesh,ring,raf,lastX=0,lastY=0,drag=false,pointerId=null,resizeObserver;
+  let cleanupDone=false;
+  const initialCamera=5.6;
+  const report=document.getElementById('planetRenderStatus');
+  const sceneState={zoom:initialCamera,yaw:0,pitch:0,camera:null,fallback:false,cleanup:null};planetScene=sceneState;
+  try{
+    if(!window.THREE||!THREE.WebGLRenderer)throw new Error('Three.js is unavailable');
+    renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.6));renderer.setSize(host.clientWidth||600,host.clientHeight||440,false);
+    renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;host.appendChild(renderer.domElement);
+    scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(38,host.clientWidth/(host.clientHeight||440),.1,100);camera.position.z=initialCamera;sceneState.camera=camera;
+    scene.add(new THREE.AmbientLight(0xffffff,1.2));const key=new THREE.DirectionalLight(0xffffff,3.3);key.position.set(-3,2,4);scene.add(key);
+    const fill=new THREE.DirectionalLight(0x778aff,.7);fill.position.set(4,-1,-3);scene.add(fill);
+    const group=new THREE.Group();scene.add(group);
+    mesh=new THREE.Mesh(new THREE.SphereGeometry(1,64,48),new THREE.MeshStandardMaterial({map:makePlanetTexture(p),roughness:.82,metalness:0}));group.add(mesh);
+    if(p.id==='saturn'){
+      const ringMat=new THREE.MeshStandardMaterial({color:0xd8c9a7,side:THREE.DoubleSide,transparent:true,opacity:.83,roughness:1});
+      ring=new THREE.Mesh(new THREE.RingGeometry(1.24,1.94,100),ringMat);ring.rotation.x=Math.PI/2.25;ring.rotation.y=.08;group.add(ring);
+    }
+    const onResize=()=>{if(!renderer||!host.isConnected)return;const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();};
+    resizeObserver=typeof ResizeObserver!=='undefined'?new ResizeObserver(onResize):null;if(resizeObserver)resizeObserver.observe(host);else window.addEventListener('resize',onResize);
+    const onDown=e=>{drag=true;pointerId=e.pointerId;lastX=e.clientX;lastY=e.clientY;host.setPointerCapture?.(e.pointerId);};
+    const onMove=e=>{if(!drag||e.pointerId!==pointerId)return;sceneState.yaw+=(e.clientX-lastX)*.008;sceneState.pitch+=(e.clientY-lastY)*.008;sceneState.pitch=Math.max(-1.35,Math.min(1.35,sceneState.pitch));lastX=e.clientX;lastY=e.clientY;};
+    const onUp=e=>{if(e.pointerId===pointerId){drag=false;pointerId=null;}};
+    const onWheel=e=>{e.preventDefault();sceneState.zoom=Math.max(3.4,Math.min(9,sceneState.zoom+Math.sign(e.deltaY)*.35));camera.position.z=sceneState.zoom;};
+    const onKey=e=>{if(e.key==='ArrowLeft')sceneState.yaw-=.12;else if(e.key==='ArrowRight')sceneState.yaw+=.12;else if(e.key==='ArrowUp')sceneState.pitch=Math.max(-1.35,sceneState.pitch-.12);else if(e.key==='ArrowDown')sceneState.pitch=Math.min(1.35,sceneState.pitch+.12);else if(e.key==='+'||e.key==='=')adjustPlanetZoom(-.5);else if(e.key==='-')adjustPlanetZoom(.5);else if(e.key==='Home')resetPlanetView();else return;e.preventDefault();};
+    host.addEventListener('pointerdown',onDown);host.addEventListener('pointermove',onMove);host.addEventListener('pointerup',onUp);host.addEventListener('pointercancel',onUp);host.addEventListener('wheel',onWheel,{passive:false});host.addEventListener('keydown',onKey);
+    let displayYaw=0,displayPitch=0;const animate=()=>{if(cleanupDone)return;raf=requestAnimationFrame(animate);if(!drag)sceneState.yaw+=.0008;displayYaw+=(sceneState.yaw-displayYaw)*.22;displayPitch+=(sceneState.pitch-displayPitch)*.22;camera.position.z+=(sceneState.zoom-camera.position.z)*.18;group.rotation.y=displayYaw;group.rotation.x=displayPitch;renderer.render(scene,camera);};animate();
+    sceneState.cleanup=()=>{cleanupDone=true;cancelAnimationFrame(raf);resizeObserver?.disconnect();if(!resizeObserver)window.removeEventListener('resize',onResize);host.removeEventListener('pointerdown',onDown);host.removeEventListener('pointermove',onMove);host.removeEventListener('pointerup',onUp);host.removeEventListener('pointercancel',onUp);host.removeEventListener('wheel',onWheel);host.removeEventListener('keydown',onKey);scene.traverse(obj=>{if(obj.geometry)obj.geometry.dispose();if(obj.material){const materials=Array.isArray(obj.material)?obj.material:[obj.material];materials.forEach(m=>{if(m.map)m.map.dispose();m.dispose();});}});renderer.dispose();renderer.forceContextLoss?.();};
+    if(report)report.textContent='3D SIMULATION · DRAG TO ROTATE';
+  }catch(error){
+    sceneState.fallback=true;host.innerHTML=`<div class="planet-canvas-fallback" id="planetCssGlobe" style="--planet-accent:${p.color}">${p.id==='saturn'?'<span class="planet-ring-fallback"></span>':''}</div><div class="planet-fallback-note">Interactive illustration · WebGL is unavailable in this browser. Rotate with touch or pointer; use the zoom controls.</div>`;
+    const globe=host.querySelector('#planetCssGlobe');
+    const onDown=e=>{drag=true;lastX=e.clientX;lastY=e.clientY;e.preventDefault();};const onMove=e=>{if(!drag)return;sceneState.yaw+=(e.clientX-lastX)*.5;sceneState.pitch+=(e.clientY-lastY)*.35;lastX=e.clientX;lastY=e.clientY;globe.style.transform=`translate(-50%,-50%) rotate(${sceneState.pitch}deg) rotateY(${sceneState.yaw}deg) scale(${initialCamera/sceneState.zoom})`;};const onUp=()=>drag=false;
+    host.addEventListener('pointerdown',onDown);window.addEventListener('pointermove',onMove);window.addEventListener('pointerup',onUp);
+    sceneState.cleanup=()=>{cleanupDone=true;host.removeEventListener('pointerdown',onDown);window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);};
+    if(report)report.textContent='WEBGL FALLBACK · INTERACTIVE VIEW';
+  }
+}
+
+function cleanupPlanetScene(){if(planetScene?.cleanup)planetScene.cleanup();planetScene=null;clearTimeout(planetTravelTimer);}
+function adjustPlanetZoom(delta){if(!planetScene)return;planetScene.zoom=Math.max(3.4,Math.min(9,planetScene.zoom+delta));if(planetScene.fallback){const globe=document.getElementById('planetCssGlobe');if(globe)globe.style.transform=`translate(-50%,-50%) rotate(${planetScene.pitch}deg) rotateY(${planetScene.yaw}deg) scale(${5.6/planetScene.zoom})`;}else if(planetScene.camera){planetScene.camera.position.z=planetScene.zoom;}}
+function resetPlanetView(){if(!planetScene)return;planetScene.zoom=5.6;planetScene.yaw=0;planetScene.pitch=0;if(planetScene.fallback){const globe=document.getElementById('planetCssGlobe');if(globe)globe.style.transform='translate(-50%,-50%) scale(1)';}else if(planetScene.camera)planetScene.camera.position.z=5.6;}
 
 checkStreak();
 updateXPUI();
