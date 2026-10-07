@@ -584,14 +584,72 @@ footer.foot{text-align:center;padding:26px;color:var(--text-faint);font-size:11p
 .planet-quiz button:hover,.planet-quiz button:focus-visible{border-color:var(--cyan);outline:none;}
 .planet-quiz-feedback{font-size:11px;line-height:1.5;color:var(--text-dim);margin-top:8px;}
 .planet-sim-note{font:9px/1.5 var(--font-mono);color:var(--text-faint);margin-top:8px;}
-.planet-travel{min-height:44vh;display:grid;place-items:center;text-align:center;padding:25px;}
-.planet-travel-core{max-width:500px}
+.planet-travel{min-height:70vh;display:grid;place-items:center;text-align:center;padding:25px;position:relative;overflow:hidden;border:1px solid var(--border);border-radius:18px;background:#03040d}
+.planet-travel-scene{position:absolute;inset:0;z-index:0}
+.planet-travel-scene canvas{width:100%;height:100%;display:block}
+.planet-travel-core{max-width:500px;position:relative;z-index:2;padding:22px;border:1px solid rgba(255,255,255,.14);border-radius:16px;background:rgba(4,7,16,.58);backdrop-filter:blur(7px)}
 .planet-travel-orb{width:120px;height:120px;border-radius:50%;margin:0 auto 24px;background:radial-gradient(circle at 30% 28%,#fff,var(--planet-accent) 35%,#090914 84%);box-shadow:0 0 70px color-mix(in srgb,var(--planet-accent) 60%,transparent);animation:planetTravel .75s ease-in-out infinite alternate;}
 @keyframes planetTravel{to{transform:scale(1.16);box-shadow:0 0 120px color-mix(in srgb,var(--planet-accent) 70%,transparent)}}
 @media(max-width:950px){.planet-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.planet-view-grid{grid-template-columns:1fr}.planet-visual-panel{min-height:390px}.planet-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.planet-info-card{grid-row:span 2}}
 @media(max-width:620px){.ship-entry{padding:23px 19px;min-height:220px}.ship-entry-art{width:125px;height:125px;flex-basis:125px;transform:scale(.75);margin-right:-13px}.ship-entry h2{font-size:19px}.ship-entry p{font-size:12px}.ship-entry .eyebrow{letter-spacing:2px}.planet-panel{padding:24px 13px 38px!important}.planet-exp-top{margin:8px 44px 16px 0}.planet-exp-actions{width:100%}.planet-grid{gap:9px}.planet-card{padding:12px}.planet-card-visual{height:77px}.planet-card-orb{width:58px;height:58px}.planet-card h3{font-size:11px}.planet-card p{font-size:10.5px;min-height:44px}.planet-card-meta{font-size:9px}.planet-card .btn{padding:8px 9px}.planet-side{display:flex}.planet-visual-panel{min-height:340px}.planet-fact-grid{gap:6px}.planet-exp .btn.planet-small{padding:8px 11px}.planet-controls button{width:46px;height:46px}}
 @media(prefers-reduced-motion:reduce){.ship-rocket,.planet-travel-orb{animation:none}.ship-entry-cta{transition:none}}
 
+/* Playable field mission HUD */
+.planet-difficulty{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px;align-items:center}
+.planet-difficulty-label{font:10px var(--font-mono);letter-spacing:1px;color:var(--text-dim);margin-right:4px}
+.planet-difficulty button{border:1px solid var(--border);border-radius:999px;padding:8px 13px;background:rgba(255,255,255,.035);font-size:11px;color:var(--text-dim)}
+.planet-difficulty button[aria-pressed=true]{border-color:var(--cyan);color:#fff;background:rgba(34,211,238,.12)}
+.planet-game{--game-accent:#c75d3d;position:relative;width:min(100%,1380px);margin:0 auto}
+.planet-game-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:8px 54px 12px 0}
+.planet-game-heading{font-family:var(--font-display);font-size:clamp(16px,2.4vw,24px);letter-spacing:.5px}
+.planet-game-meta{color:var(--text-dim);font:10px var(--font-mono);margin-top:4px}
+.planet-game-stage{height:min(75vh,760px);min-height:500px;position:relative;overflow:hidden;border:1px solid color-mix(in srgb,var(--game-accent) 55%,var(--border));border-radius:18px;background:#100e16;touch-action:none;isolation:isolate}
+.planet-game-canvas{position:absolute;inset:0;touch-action:none;cursor:crosshair}
+.planet-game-canvas canvas{width:100%;height:100%;display:block}
+.planet-game-hud{position:absolute;z-index:4;inset:12px 12px auto;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;pointer-events:none}
+.planet-game-objectives{width:min(300px,58vw);padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.17);background:rgba(7,9,17,.76);backdrop-filter:blur(10px)}
+.planet-game-objectives .label{font:9px var(--font-mono);letter-spacing:1.2px;color:var(--cyan);margin-bottom:6px}
+.planet-game-objectives strong{display:block;font:600 12px/1.45 var(--font-body)}
+.planet-game-objectives .count{font:10px var(--font-mono);color:var(--text-dim);margin-top:6px}
+.planet-game-status{padding:8px 10px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(7,9,17,.74);font:10px var(--font-mono);white-space:nowrap}
+.planet-game-radar{position:absolute;z-index:4;bottom:14px;left:14px;width:116px;height:116px;border:1px solid rgba(34,211,238,.55);border-radius:50%;background:rgba(4,13,23,.72);box-shadow:0 0 20px rgba(34,211,238,.14)}
+.planet-game-radar canvas{display:block;width:100%;height:100%}
+.planet-game-prompt{position:absolute;z-index:5;right:14px;bottom:14px;width:min(320px,calc(100% - 155px));min-height:62px;padding:11px 13px;border:1px solid rgba(34,211,238,.45);border-radius:12px;background:rgba(4,9,18,.82);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.planet-game-prompt p{font-size:11px;line-height:1.4;color:var(--text-dim)}
+.planet-game-prompt strong{display:block;color:#fff;font-size:12px}
+.planet-game-prompt button{flex-shrink:0;padding:10px 13px;border-radius:999px;background:linear-gradient(90deg,var(--violet),var(--cyan));color:#050611;font-size:11px;font-weight:700;min-height:42px}
+.planet-game-message{position:absolute;z-index:6;left:50%;bottom:96px;transform:translateX(-50%);max-width:min(520px,90%);padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(5,8,17,.9);font-size:12px;line-height:1.5;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s ease}
+.planet-game-message.show{opacity:1}
+.planet-scan-line{position:absolute;z-index:3;inset:0;pointer-events:none;background:linear-gradient(transparent 48%,rgba(34,211,238,.16) 50%,transparent 52%);background-size:100% 12px;opacity:0}
+.planet-game-stage.scanning .planet-scan-line{opacity:1;animation:scanSweep .8s linear infinite}
+@keyframes scanSweep{to{background-position:0 12px}}
+.planet-game-crosshair{position:absolute;z-index:3;left:50%;top:48%;width:20px;height:20px;transform:translate(-50%,-50%);border:1px solid rgba(255,255,255,.6);border-radius:50%;pointer-events:none}
+.planet-game-crosshair::before,.planet-game-crosshair::after{content:'';position:absolute;background:rgba(255,255,255,.72)}
+.planet-game-crosshair::before{width:1px;height:30px;left:9px;top:-6px}.planet-game-crosshair::after{height:1px;width:30px;left:-6px;top:9px}
+.planet-game-touch{display:none;position:absolute;z-index:7;bottom:15px;left:15px;width:132px;height:132px;border-radius:50%;border:1px solid rgba(34,211,238,.62);background:rgba(3,12,23,.48);touch-action:none}
+.planet-game-stick{position:absolute;left:40px;top:40px;width:50px;height:50px;border-radius:50%;border:1px solid rgba(255,255,255,.62);background:rgba(34,211,238,.28);box-shadow:0 0 16px rgba(34,211,238,.26);pointer-events:none}
+.planet-game-mobile-actions{display:none;position:absolute;z-index:7;right:14px;bottom:15px}
+.planet-game-mobile-actions button{min-width:90px;min-height:56px;padding:10px 15px;border-radius:999px;background:linear-gradient(90deg,var(--violet),var(--cyan));color:#040711;font-weight:700;font-size:12px}
+.planet-game-help{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;padding:11px 3px 0;color:var(--text-dim);font:10px/1.5 var(--font-mono)}
+.planet-game-help button{color:var(--cyan);font:inherit;text-decoration:underline;text-underline-offset:3px}
+.planet-game-pause{position:absolute;z-index:12;inset:0;display:none;place-items:center;background:rgba(3,5,13,.76);backdrop-filter:blur(8px);padding:20px}
+.planet-game-pause.open{display:grid}
+.planet-game-menu{width:min(440px,100%);padding:24px;border:1px solid var(--border-bright);border-radius:18px;background:rgba(12,13,30,.96);box-shadow:0 20px 70px rgba(0,0,0,.5)}
+.planet-game-menu h2{font-family:var(--font-display);font-size:20px;margin-bottom:8px}
+.planet-game-menu p{font-size:12px;line-height:1.55;color:var(--text-dim);margin-bottom:14px}
+.planet-game-menu-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.planet-game-menu-actions button{min-height:43px;padding:10px;border:1px solid var(--border);border-radius:10px;background:rgba(255,255,255,.045);font-size:11px}
+.planet-game-menu-actions button:hover{border-color:var(--cyan)}
+.planet-game-end{position:absolute;z-index:13;inset:0;display:none;place-items:center;background:rgba(2,5,12,.76);backdrop-filter:blur(7px);padding:20px}
+.planet-game-end.open{display:grid}
+.planet-game-end-card{width:min(460px,100%);padding:23px;border:1px solid rgba(52,211,153,.55);border-radius:18px;background:rgba(8,18,22,.96)}
+.planet-game-end-card h2{font-family:var(--font-display);font-size:20px;color:var(--good);margin-bottom:9px}
+.planet-game-end-card p{font-size:12px;line-height:1.6;color:var(--text-dim);margin-bottom:15px}
+.planet-game-end-card .actions{display:flex;gap:9px;flex-wrap:wrap}
+.planet-flight-note{position:absolute;left:50%;top:57%;transform:translate(-50%,-50%);padding:7px 11px;border:1px solid rgba(255,255,255,.17);border-radius:999px;background:rgba(4,8,18,.68);font:9px var(--font-mono);color:var(--text-dim);pointer-events:none}
+@media(max-width:760px){.planet-game-stage{height:68vh;min-height:510px}.planet-game-head{margin-right:44px;align-items:flex-start}.planet-game-hud{inset:9px 9px auto}.planet-game-objectives{width:min(240px,63vw);padding:10px}.planet-game-objectives strong{font-size:11px}.planet-game-status{font-size:9px;padding:7px 8px}.planet-game-radar{display:none}.planet-game-prompt{right:13px;bottom:155px;width:min(340px,calc(100% - 26px));min-height:58px}.planet-game-touch{display:block}.planet-game-mobile-actions{display:block}.planet-game-help{font-size:9px}.planet-game-crosshair{top:46%}}
+@media(max-width:420px){.planet-game-stage{min-height:530px}.planet-game-objectives{width:61vw}.planet-game-objectives .count{font-size:9px}.planet-game-status{white-space:normal;max-width:112px;text-align:right}.planet-game-touch{width:118px;height:118px}.planet-game-stick{left:34px;top:34px;width:48px;height:48px}.planet-game-prompt{bottom:147px}.planet-game-menu-actions{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.planet-game-stage.scanning .planet-scan-line{animation:none}}
 </style>
 </head>
 <body>
@@ -687,6 +745,7 @@ const DEFAULT_STATE = {
   gamesCompleted: [],
   planetDiscoveries: [],     // planet/feature ids discovered in Planet Exploration
   planetMissionsCompleted: [],// planet ids with a completed exploration quiz
+  planetSamples: [],          // material and atmospheric samples collected in field missions
   badges: [],
   visitedSections: []
 };
@@ -6497,9 +6556,12 @@ let planetScene = null;
 let planetTravelTimer = null;
 let planetSelectedPoi = 0;
 let planetQuizFeedback = '';
+let planetDifficulty = 'easy';
+let planetGame = null;
 
 function planetVisitedCount(){return new Set((state.planetMissionsCompleted||[])).size;}
 function launchSpaceship(){markVisited('planetExploration');renderShipCockpit();}
+function setPlanetDifficulty(level){planetDifficulty=level;renderShipCockpit();}
 function planetColorHex(id){return PLANET_DESTINATIONS.find(p=>p.id===id)?.color||'#22d3ee';}
 function planetName(id){return PLANET_DESTINATIONS.find(p=>p.id===id)?.name||'planet';}
 function setupPlanetPanel(){const panel=document.getElementById('fsPanel');if(panel)panel.classList.add('planet-panel');}
@@ -6510,6 +6572,7 @@ function renderShipCockpit(){
   const html=`<section class="planet-exp" aria-labelledby="planetCockpitTitle">
     <header class="planet-exp-top"><div><div class="eyebrow">Aura Cosmos · flight deck</div><h1 class="planet-exp-title" id="planetCockpitTitle">Spaceship mission interface</h1><p class="planet-exp-sub">Choose a destination. Each world has a compact field guide, real features to discover and an optional science mission.</p></div><div class="planet-exp-actions"><button class="btn ghost planet-small" onclick="closeFullscreen()">← Return to Aura Cosmos</button></div></header>
     <div class="planet-cockpit"><h2>🚀 Mission control, your ship is ready.</h2><p>Solar system navigation online · ${completeCount}/8 planet missions completed · XP is added to your existing Aura Cosmos progress.</p></div>
+    <div class="planet-difficulty" role="group" aria-label="Mission difficulty"><span class="planet-difficulty-label">MISSION PROFILE</span><button onclick="setPlanetDifficulty('easy')" aria-pressed="${planetDifficulty==='easy'}">Easy · guided</button><button onclick="setPlanetDifficulty('medium')" aria-pressed="${planetDifficulty==='medium'}">Medium · standard</button><button onclick="setPlanetDifficulty('hard')" aria-pressed="${planetDifficulty==='hard'}">Hard · field ops</button></div>
     <div class="planet-grid" aria-label="Choose a destination">${PLANET_DESTINATIONS.map((p,i)=>`<article class="planet-card" style="--planet-color:${p.color}"><div class="planet-card-visual"><div class="planet-card-orb ${p.id==='saturn'?'ringed':''}" aria-hidden="true"></div></div><h3>${p.name}</h3><p>${p.summary}</p><div class="planet-card-meta">${p.type}<br>Mean distance · ${p.distance}</div><div class="planet-status">${(state.planetMissionsCompleted||[]).includes(p.id)?'✓ MISSION COMPLETE':''}</div><button class="btn small" onclick="travelToPlanet('${p.id}')" aria-label="Travel to ${p.name}">Explore ${i===0?'destination':'planet'} →</button></article>`).join('')}</div>
     <p class="planet-sim-note">Planet illustrations and surface views are educational simulations. They are not geographic maps or to scale.</p>
   </section>`;
@@ -6519,8 +6582,26 @@ function renderShipCockpit(){
 function travelToPlanet(id){
   const p=PLANET_DESTINATIONS.find(item=>item.id===id);if(!p)return;
   const accent=p.color;
-  openPlanetStage(`<section class="planet-exp planet-travel" style="--planet-accent:${accent}"><div class="planet-travel-core"><div class="eyebrow">Trajectory locked · ${p.name}</div><div class="planet-travel-orb" aria-hidden="true"></div><h1 class="planet-exp-title">Arriving at ${p.name}</h1><p class="planet-exp-sub">The planetary field guide will be ready in a moment.</p><button class="btn ghost planet-small" onclick="showPlanet('${p.id}')">Skip travel →</button></div></section>`);
-  planetTravelTimer=setTimeout(()=>showPlanet(id),750);
+  openPlanetStage(`<section class="planet-exp planet-travel" id="planetTravelStage" style="--planet-accent:${accent}"><div class="planet-travel-scene" id="planetTravelScene"></div><div class="planet-travel-core"><div class="eyebrow">Flight sequence · ${p.name}</div><div class="planet-travel-orb" aria-hidden="true"></div><h1 class="planet-exp-title">Launch · cruise · descent</h1><p class="planet-exp-sub">Engines on. Planetary approach. Touchdown sequence begins.</p><button class="btn ghost planet-small" onclick="startPlanetGame('${p.id}')">Skip sequence · begin mission →</button></div></section>`);
+  initPlanetTravelScene(p);
+  planetTravelTimer=setTimeout(()=>startPlanetGame(id),3000);
+}
+function initPlanetTravelScene(p){
+  const host=document.getElementById('planetTravelScene'),stage=document.getElementById('planetTravelStage');if(!host||!window.THREE)return;
+  let renderer,raf,resizeObserver,disposed=false;try{
+    renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'low-power'});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.35));renderer.setSize(host.clientWidth||900,host.clientHeight||600,false);renderer.outputEncoding=THREE.sRGBEncoding;host.appendChild(renderer.domElement);stage?.classList.add('has-3d');
+    const scene=new THREE.Scene();scene.background=new THREE.Color(0x02040d);const camera=new THREE.PerspectiveCamera(62,host.clientWidth/(host.clientHeight||600),.1,500);camera.position.set(0,2.5,13);
+    scene.add(new THREE.AmbientLight(0x7286b5,1.15));const sun=new THREE.DirectionalLight(0xffe7c8,2.7);sun.position.set(-8,6,8);scene.add(sun);
+    const vertices=[];for(let i=0;i<1000;i++){vertices.push((Math.random()-.5)*280,(Math.random()-.5)*180,-20-Math.random()*240);}const starsGeo=new THREE.BufferGeometry();starsGeo.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));const stars=new THREE.Points(starsGeo,new THREE.PointsMaterial({color:0xdde8ff,size:1.1,sizeAttenuation:false,transparent:true,opacity:.8}));scene.add(stars);
+    const planet=new THREE.Mesh(new THREE.SphereGeometry(12,64,48),new THREE.MeshStandardMaterial({map:planetTexture(p),roughness:.86}));planet.position.set(0,1,-58);planet.scale.setScalar(.34);scene.add(planet);
+    if(p.id==='saturn'){const ring=new THREE.Mesh(new THREE.RingGeometry(15,22,96),new THREE.MeshStandardMaterial({color:0xd4c29f,transparent:true,opacity:.8,side:THREE.DoubleSide}));ring.rotation.x=Math.PI/2.35;ring.position.copy(planet.position);ring.scale.copy(planet.scale);scene.add(ring);planet.userData.ring=ring;}
+    if(p.id==='jupiter'){const spot=new THREE.Mesh(new THREE.SphereGeometry(1.1,16,12),new THREE.MeshStandardMaterial({color:0xc76143,roughness:.8}));spot.position.set(0,2,-46.4);scene.add(spot);}
+    const ship=planetVehicle('flight',p.color);ship.position.set(0,-1.2,3);ship.scale.setScalar(.72);scene.add(ship);
+    const flame=new THREE.PointLight(0x39aaff,3,12);flame.position.set(0,-.3,5);scene.add(flame);
+    const resize=()=>{if(!renderer||!host.isConnected)return;const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();};resizeObserver=typeof ResizeObserver!=='undefined'?new ResizeObserver(resize):null;resizeObserver?.observe(host);if(!resizeObserver)window.addEventListener('resize',resize);
+    const start=performance.now();const animate=now=>{if(disposed)return;raf=requestAnimationFrame(animate);const t=Math.min(1,(now-start)/3000);planet.position.z=-58+t*39;planet.position.y=1+Math.sin(t*Math.PI)*2;planet.scale.setScalar(.34+t*.48);planet.rotation.y+=.003;if(planet.userData.ring){planet.userData.ring.position.copy(planet.position);planet.userData.ring.scale.copy(planet.scale);planet.userData.ring.rotation.z+=.001;}ship.position.z=3-t*2;ship.position.y=-1.2+Math.sin(t*Math.PI*2)*.12;ship.rotation.x=Math.sin(t*4)*.018;camera.position.z=13-t*1.5;camera.lookAt(0,0,-9);stars.rotation.y+=.00012;renderer.render(scene,camera);};animate(start);
+    window._planetTravelCleanup=()=>{disposed=true;cancelAnimationFrame(raf);resizeObserver?.disconnect();if(!resizeObserver)window.removeEventListener('resize',resize);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){const mats=Array.isArray(o.material)?o.material:[o.material];mats.forEach(m=>{m.map?.dispose();m.dispose();});}});renderer.dispose();renderer.forceContextLoss?.();window._planetTravelCleanup=null;};
+  }catch(error){if(renderer)renderer.dispose();console.warn('[planet-travel] using lightweight visual fallback',error.message);}
 }
 
 function planetPoiClick(id,index){
@@ -6642,9 +6723,167 @@ function initPlanetScene(p){
   }
 }
 
-function cleanupPlanetScene(){if(planetScene?.cleanup)planetScene.cleanup();planetScene=null;clearTimeout(planetTravelTimer);}
+function cleanupPlanetScene(){if(planetScene?.cleanup)planetScene.cleanup();planetScene=null;clearTimeout(planetTravelTimer);cleanupPlanetGame();cleanupPlanetTravelScene();}
 function adjustPlanetZoom(delta){if(!planetScene)return;planetScene.zoom=Math.max(3.4,Math.min(9,planetScene.zoom+delta));if(planetScene.fallback){const globe=document.getElementById('planetCssGlobe');if(globe)globe.style.transform=`translate(-50%,-50%) rotate(${planetScene.pitch}deg) rotateY(${planetScene.yaw}deg) scale(${5.6/planetScene.zoom})`;}else if(planetScene.camera){planetScene.camera.position.z=planetScene.zoom;}}
 function resetPlanetView(){if(!planetScene)return;planetScene.zoom=5.6;planetScene.yaw=0;planetScene.pitch=0;if(planetScene.fallback){const globe=document.getElementById('planetCssGlobe');if(globe)globe.style.transform='translate(-50%,-50%) scale(1)';}else if(planetScene.camera)planetScene.camera.position.z=5.6;}
+
+const PLANET_DIFFICULTIES={easy:{scans:2,samples:1,seconds:900,distance:.78,assist:true,reward:80,label:'EASY · GUIDED'},medium:{scans:3,samples:1,seconds:600,distance:1,assist:'near',reward:120,label:'MEDIUM · STANDARD'},hard:{scans:3,samples:2,seconds:420,distance:1.35,assist:false,reward:180,label:'HARD · FIELD OPS'}};
+function planetMissionMode(p){return ['jupiter','saturn','uranus','neptune'].includes(p.id)?'flight':'surface';}
+function formatMissionTime(seconds){const s=Math.max(0,Math.ceil(seconds));return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
+function planetTerrainHeight(p,x,z){
+  let h=1.25*Math.sin(x*.055)*Math.cos(z*.047)+.72*Math.sin((x+z)*.12)+.42*Math.cos(x*.19-z*.13);
+  const crater=(cx,cz,r,depth)=>{const d=Math.hypot(x-cx,z-cz)/r;if(d<1.5){h+=-depth*Math.exp(-d*d*3)+depth*.24*Math.exp(-Math.pow((d-1.02)*8,2));}};
+  if(p.id==='mercury'){crater(-22,-12,15,4.5);crater(28,-40,11,3);crater(40,26,18,5);}
+  if(p.id==='mars'){crater(27,-30,17,4);crater(-31,7,13,3.2);h+=14*Math.exp(-((x-32)**2+(z+38)**2)/700);h-=4*Math.exp(-((x+26)/6)**2)*Math.exp(-(z*z)/5000);}
+  if(p.id==='venus'){h+=12*Math.exp(-((x-30)**2+(z+35)**2)/850);h+=5*Math.exp(-((x+30)**2+(z-12)**2)/500);}
+  if(p.id==='earth'){h*=1.2;h+=5*Math.exp(-((x-24)**2+(z+38)**2)/500);}
+  return h;
+}
+function planetTexture(p){
+  const c=document.createElement('canvas');c.width=256;c.height=256;const ctx=c.getContext('2d');const img=ctx.createImageData(256,256);let seed=p.id.split('').reduce((n,ch)=>n+ch.charCodeAt(0),0)*997;
+  const base=new THREE.Color(p.color);const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+  for(let i=0;i<img.data.length;i+=4){const n=(rand()-.5)*52;img.data[i]=Math.max(0,Math.min(255,base.r*255+n));img.data[i+1]=Math.max(0,Math.min(255,base.g*255+n));img.data[i+2]=Math.max(0,Math.min(255,base.b*255+n));img.data[i+3]=255;}
+  ctx.putImageData(img,0,0);ctx.globalAlpha=.2;for(let i=0;i<280;i++){const x=rand()*256,y=rand()*256,r=1+rand()*8;ctx.fillStyle=rand()>.5?'#fff':'#090a10';ctx.beginPath();ctx.ellipse(x,y,r,r*.35,rand()*Math.PI,0,Math.PI*2);ctx.fill();}
+  const tx=new THREE.CanvasTexture(c);tx.encoding=THREE.sRGBEncoding;tx.wrapS=tx.wrapT=THREE.RepeatWrapping;tx.repeat.set(3,2);return tx;
+}
+function planetVehicle(mode,accent){
+  const root=new THREE.Group();const dark=new THREE.MeshStandardMaterial({color:0x202831,roughness:.72,metalness:.45});const shell=new THREE.MeshStandardMaterial({color:0xb8bec4,roughness:.48,metalness:.28});const glow=new THREE.MeshStandardMaterial({color:0x2fbbe9,emissive:0x126388,emissiveIntensity:1.3,roughness:.25});
+  if(mode==='surface'){
+    const body=new THREE.Mesh(new THREE.BoxGeometry(2.7,.8,2),shell);body.position.y=1.35;root.add(body);
+    const deck=new THREE.Mesh(new THREE.BoxGeometry(1.4,.45,1.4),dark);deck.position.set(0,1.95,-.1);root.add(deck);
+    const mast=new THREE.Mesh(new THREE.CylinderGeometry(.09,.12,.9,10),dark);mast.position.set(0,2.55,-.38);root.add(mast);
+    const eye=new THREE.Mesh(new THREE.SphereGeometry(.25,12,10),glow);eye.position.set(0,2.8,-.38);root.add(eye);
+    for(const x of [-1.38,1.38])for(const z of [-.62,.62]){const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.49,.49,.28,14),dark);wheel.rotation.z=Math.PI/2;wheel.position.set(x,.52,z);root.add(wheel);const hub=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.3,12),glow);hub.rotation.z=Math.PI/2;hub.position.set(x,.52,z);root.add(hub);}
+  }else{
+    const hull=new THREE.Mesh(new THREE.ConeGeometry(1,3.6,8),shell);hull.rotation.x=-Math.PI/2;root.add(hull);
+    const cockpit=new THREE.Mesh(new THREE.SphereGeometry(.58,16,12),new THREE.MeshStandardMaterial({color:0x32677e,metalness:.52,roughness:.2,emissive:0x092735}));cockpit.position.set(0,.26,.18);root.add(cockpit);
+    for(const x of [-1.7,1.7]){const wing=new THREE.Mesh(new THREE.BoxGeometry(1.8,.12,1.05),dark);wing.position.set(x,-.12,.1);root.add(wing);}
+    const exhaust=new THREE.Mesh(new THREE.ConeGeometry(.48,1.35,12),glow);exhaust.rotation.x=Math.PI;exhaust.position.z=2.1;root.add(exhaust);
+  }
+  root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});root.userData.accent=accent;return root;
+}
+function addTerrainRocks(scene,p){
+  const geo=new THREE.DodecahedronGeometry(1,0);const mat=new THREE.MeshStandardMaterial({color:p.id==='earth'?0x515247:p.id==='venus'?0x574a3e:0x554840,roughness:.94});const rocks=new THREE.InstancedMesh(geo,mat,210);const dummy=new THREE.Object3D();let seed=p.id.length*811;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
+  for(let i=0;i<210;i++){const x=(rnd()-.5)*260,z=(rnd()-.5)*260;if(Math.hypot(x,z)<9)continue;const h=planetTerrainHeight(p,x,z);const s=.3+rnd()*2.2;dummy.position.set(x,h+s*.35,z);dummy.rotation.set(rnd()*1.2,rnd()*Math.PI*2,rnd()*1.2);dummy.scale.set(s*(.65+rnd()),s*(.5+rnd()*.5),s*(.6+rnd()));dummy.updateMatrix();rocks.setMatrixAt(i,dummy.matrix);}
+  rocks.instanceMatrix.needsUpdate=true;rocks.castShadow=true;rocks.receiveShadow=true;scene.add(rocks);return rocks;
+}
+function createSurfaceLandmark(scene,p,index,x,z){
+  const color=new THREE.Color(p.color);const mat=new THREE.MeshStandardMaterial({color,roughness:.9,emissive:color,emissiveIntensity:.09});const dark=new THREE.MeshStandardMaterial({color:0x25201d,roughness:1});const g=new THREE.Group();const y=planetTerrainHeight(p,x,z);
+  if((p.id==='mars'&&index===0)||(p.id==='venus'&&index===0)){const m=new THREE.Mesh(new THREE.ConeGeometry(p.id==='mars'?10:8,p.id==='mars'?17:13,28),mat);m.position.y=(p.id==='mars'?8.5:6.5)+y;m.castShadow=true;g.add(m);}
+  else if((p.id==='mercury'&&index===0)||(p.id==='earth'&&index===2)||(p.id==='mars'&&index===2)){const rim=new THREE.Mesh(new THREE.TorusGeometry(8,1.25,8,48),mat);rim.rotation.x=Math.PI/2;rim.position.y=y+1;g.add(rim);const floor=new THREE.Mesh(new THREE.CircleGeometry(7,32),dark);floor.rotation.x=-Math.PI/2;floor.position.y=y+.15;g.add(floor);}
+  else if((p.id==='mars'&&index===1)||(p.id==='earth'&&index===1)){const ridge=new THREE.Mesh(new THREE.BoxGeometry(38,7,7),mat);ridge.rotation.y=-.4;ridge.position.set(0,y+3,-1);ridge.castShadow=true;g.add(ridge);}
+  else if(p.id==='venus'&&index===1){const plateau=new THREE.Mesh(new THREE.CylinderGeometry(11,15,7,28),mat);plateau.position.y=y+3.5;plateau.castShadow=true;g.add(plateau);}
+  else if(p.id==='mercury'&&index===2){const ring=new THREE.Mesh(new THREE.TorusGeometry(6,.8,8,40),mat);ring.rotation.x=Math.PI/2;ring.position.y=y+.8;g.add(ring);}
+  else{const boulder=new THREE.Mesh(new THREE.DodecahedronGeometry(6,1),mat);boulder.scale.set(1.1,.68,.9);boulder.position.y=y+2.8;boulder.castShadow=true;g.add(boulder);}
+  g.position.set(x,0,z);g.userData.kind='landmark';scene.add(g);return g;
+}
+function createSampleNode(scene,p,index,x,z){
+  const y=planetTerrainHeight(p,x,z),root=new THREE.Group();const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(1.2+index*.16,1),new THREE.MeshStandardMaterial({color:p.id==='earth'?0x858477:0x726258,roughness:.95}));rock.position.y=1;rock.scale.set(1.3,.75,1);rock.castShadow=true;root.add(rock);
+  const glint=new THREE.Mesh(new THREE.OctahedronGeometry(.36,0),new THREE.MeshStandardMaterial({color:0x7adfff,emissive:0x1686bd,emissiveIntensity:.8,roughness:.35}));glint.position.set(.3,2.05,.1);root.add(glint);root.position.set(x,y,z);root.userData.kind='sample';scene.add(root);return root;
+}
+function createAtmosphereWorld(scene,p){
+  const globe=new THREE.Mesh(new THREE.SphereGeometry(25,64,48),new THREE.MeshStandardMaterial({map:planetTexture(p),roughness:.82,metalness:0}));globe.position.set(0,0,0);globe.receiveShadow=true;scene.add(globe);
+  for(let i=0;i<5;i++){const cloud=new THREE.Mesh(new THREE.SphereGeometry(25.35+i*.43,48,32),new THREE.MeshStandardMaterial({color:new THREE.Color(p.color).offsetHSL(0,.05,(i%2?-.12:.1)),transparent:true,opacity:.07,roughness:.95,side:THREE.BackSide,depthWrite:false}));cloud.rotation.y=i*.7;scene.add(cloud);}
+  if(p.id==='saturn'){const rings=new THREE.Mesh(new THREE.RingGeometry(32,47,120),new THREE.MeshStandardMaterial({color:0xd3c19d,roughness:.9,transparent:true,opacity:.76,side:THREE.DoubleSide}));rings.rotation.x=Math.PI/2.25;scene.add(rings);}
+  const lights=new THREE.PointLight(0xffe7c0,120,0,2);lights.position.set(-90,35,70);scene.add(lights);
+  const spots=[];
+  if(p.id==='jupiter'){const spot=new THREE.Mesh(new THREE.SphereGeometry(2.7,24,16),new THREE.MeshStandardMaterial({color:0xc35e41,roughness:.8,emissive:0x3f150c,emissiveIntensity:.26}));spot.position.set(0,3,24.9);scene.add(spot);spots.push(spot);}
+  return {globe,spots};
+}
+function startPlanetGame(id){
+  const p=PLANET_DESTINATIONS.find(item=>item.id===id);if(!p)return;cleanupPlanetScene();planetGame={planet:p,mode:planetMissionMode(p),difficulty:planetDifficulty,active:false,paused:false,expired:false,complete:false,keys:{},input:{x:0,y:0},yaw:0,pitch:-.16,scanned:[],samples:[],target:null,scanBusy:false,lastHud:0,messageTimer:null,raf:0,cleanup:null};
+  planetGame.profile=PLANET_DIFFICULTIES[planetDifficulty]||PLANET_DIFFICULTIES.easy;planetGame.startedAt=performance.now();
+  renderPlanetGame(p);initPlanetGameScene(p);setTimeout(()=>{if(planetGame&&!planetGame.paused){planetGame.active=true;gameNotify('Landing confirmed. Rover systems are online. Move out and follow the terrain signals.');updatePlanetGameHUD();}},1250);
+}
+function renderPlanetGame(p){
+  const mode=planetMissionMode(p),profile=PLANET_DIFFICULTIES[planetDifficulty]||PLANET_DIFFICULTIES.easy,prior=(state.planetMissionsCompleted||[]).includes(p.id);const adjective=mode==='surface'?'Surface survey':'Atmospheric flight';
+  const html=`<section class="planet-game" style="--game-accent:${p.color}" aria-label="${p.name} exploration game"><header class="planet-game-head"><div><h1 class="planet-game-heading">${p.name} · ${adjective}</h1><p class="planet-game-meta">FIELD MISSION 01 · ${profile.label}${prior?' · REPLAY':''}</p></div><button class="btn ghost planet-small" onclick="togglePlanetPause()" aria-label="Pause mission">Ⅱ Pause</button></header>
+  <div class="planet-game-stage" id="planetGameStage"><div class="planet-game-canvas" id="planetGameCanvas" aria-label="3D planetary environment, use WASD to move and drag to look"></div><div class="planet-scan-line"></div><div class="planet-game-crosshair" aria-hidden="true"></div>
+    ${mode==='flight'?'<div class="planet-flight-note">HIGH-ALTITUDE OBSERVATION · NO SOLID SURFACE</div>':''}
+    <div class="planet-game-hud"><div class="planet-game-objectives"><div class="label">PRIMARY OBJECTIVE</div><strong id="planetObjectiveText">${mode==='surface'?'Survey geological features and collect field samples.':'Survey storms, cloud bands and atmospheric readings.'}</strong><div class="count" id="planetObjectiveCount">0 / ${profile.scans} scans · 0 / ${profile.samples} ${mode==='surface'?'samples':'readings'}</div></div><div class="planet-game-status" id="planetGameTimer">${formatMissionTime(profile.seconds)}</div></div>
+    <div class="planet-game-radar"><canvas id="planetRadar" width="116" height="116" aria-label="Local mission radar"></canvas></div>
+    <div class="planet-game-prompt" id="planetGamePrompt"><p id="planetPromptCopy">${mode==='surface'?'Drive into the terrain to begin.':'Pilot toward the atmospheric signals.'}</p><button id="planetInteractButton" onclick="interactWithPlanetTarget()" disabled>Interact · E</button></div>
+    <div class="planet-game-message" id="planetGameMessage" role="status" aria-live="polite"></div><div class="planet-game-touch" id="planetGameTouch" aria-label="Virtual movement joystick"><span class="planet-game-stick" id="planetGameStick"></span></div><div class="planet-game-mobile-actions"><button onclick="interactWithPlanetTarget()" id="planetMobileInteract" disabled>Scan · E</button></div>
+    <div class="planet-game-pause" id="planetPauseMenu"><div class="planet-game-menu"><div class="eyebrow">Mission paused</div><h2>${p.name} field operations</h2><p id="planetPauseSummary">No discoveries recorded in this sortie yet.</p><div class="planet-game-menu-actions"><button onclick="togglePlanetPause()">Resume mission</button><button onclick="showPlanetInventory()">Inventory & journal</button><button onclick="showPlanetInventory('Discoveries')">Mission log</button><button onclick="renderShipCockpit()">Return to spacecraft</button><button onclick="openPlanetLearn()">Go to Learn</button><button onclick="togglePlanetPause()">Settings · ${profile.label}</button></div></div></div>
+    <div class="planet-game-end" id="planetMissionComplete"><div class="planet-game-end-card"><div class="eyebrow">Field report · ${p.name}</div><h2>Mission objectives complete</h2><p id="planetEndSummary">Your rover has completed its survey.</p><div class="actions"><button class="btn small" onclick="continuePlanetMission()">Continue exploring</button><button class="btn ghost small" onclick="renderShipCockpit()">Return to spacecraft</button></div></div></div>
+  </div><footer class="planet-game-help"><span>${mode==='surface'?'WASD drive · drag to look · Shift boost · E scan/collect · Esc pause':'WASD steer · drag to look · Space/C altitude · Shift boost · E sample · Esc pause'}</span><button onclick="showPlanetInventory()">Open field journal</button></footer><p class="planet-sim-note">Procedural educational environment · terrain, travel time and rover handling are simulations. Planet feature labels describe real science; their positions here are illustrative, not mapped coordinates.</p></section>`;
+  openFullscreen(html);setupPlanetPanel();
+}
+function gameNotify(text){const el=document.getElementById('planetGameMessage');if(!el)return;el.textContent=text;el.classList.add('show');clearTimeout(planetGame?.messageTimer);if(planetGame)planetGame.messageTimer=setTimeout(()=>el.classList.remove('show'),4200);}
+function updatePlanetGameHUD(){
+  if(!planetGame)return;const g=planetGame,p=g.planet,profile=g.profile,scanNeed=profile.scans,sampleNeed=profile.samples,scanCount=g.scanned.length,sampleCount=g.samples.length;
+  const count=document.getElementById('planetObjectiveCount');if(count)count.textContent=`${Math.min(scanCount,scanNeed)} / ${scanNeed} scans · ${Math.min(sampleCount,sampleNeed)} / ${sampleNeed} ${g.mode==='surface'?'samples':'readings'}`;
+  const remain=profile.seconds-(performance.now()-g.startedAt)/1000;const timer=document.getElementById('planetGameTimer');if(timer)timer.textContent=formatMissionTime(remain);
+  if(remain<=0&&!g.expired&&!g.complete){g.expired=true;gameNotify('Mission time window ended. Free exploration remains open; return to the ship to retry objectives.');}
+  const btn=document.getElementById('planetInteractButton'),mobile=document.getElementById('planetMobileInteract'),copy=document.getElementById('planetPromptCopy');let nearest=null,dist=Infinity;
+  for(const t of g.targets||[]){if(t.done)continue;const d=g.mode==='surface'?Math.hypot(g.player.position.x-t.x,g.player.position.z-t.z):g.player.position.distanceTo(t.position);if(d<dist){dist=d;nearest=t;}}
+  g.target=nearest&&dist<8.5?nearest:null;
+  if(copy){if(g.target){copy.innerHTML=`<strong>${g.target.kind==='sample'?(g.mode==='surface'?'FIELD SAMPLE':'ATMOSPHERIC READING'):'SCIENCE SCAN'} · ${g.target.name}</strong>${g.target.kind==='sample'?'Analyze nearby material':'Hold position to examine the feature'}`;}else if(nearest){const show=g.profile.assist===true||(g.profile.assist==='near'&&dist<28);copy.innerHTML=show?`<strong>Weak signal · ${Math.round(dist)} m</strong>${nearest.directionHint||'Explore the terrain to locate the next reading.'}`:'<strong>Explore to find the next signal</strong>Notice distinct landforms and approach them to scan.';}else{copy.innerHTML='<strong>Survey complete</strong>Continue exploring or return to the spacecraft.';}}
+  if(btn)btn.disabled=!g.target||g.scanBusy;if(mobile)mobile.disabled=!g.target||g.scanBusy;
+  if(g.mode==='surface')drawPlanetRadar();
+  const pause=document.getElementById('planetPauseSummary');if(pause)pause.textContent=`${scanCount} discoveries · ${sampleCount} ${g.mode==='surface'?'samples':'readings'} · ${formatMissionTime(Math.max(0,remain))} remaining`;
+  if(!g.complete&&!g.expired&&scanCount>=scanNeed&&sampleCount>=sampleNeed)completePlanetMission();
+}
+function drawPlanetRadar(){const canvas=document.getElementById('planetRadar');if(!canvas||!planetGame?.player)return;const c=canvas.getContext('2d');const w=canvas.width,h=canvas.height,m=w/2;c.clearRect(0,0,w,h);c.strokeStyle='rgba(34,211,238,.28)';c.lineWidth=1;[18,38,55].forEach(r=>{c.beginPath();c.arc(m,m,r,0,Math.PI*2);c.stroke();});c.beginPath();c.moveTo(m,5);c.lineTo(m,h-5);c.moveTo(5,m);c.lineTo(w-5,m);c.stroke();c.fillStyle='#e9faff';c.beginPath();c.arc(m,m,3.4,0,Math.PI*2);c.fill();if(planetGame.profile.assist===true||planetGame.profile.assist==='near'){const g=planetGame;let nearest=null,d=Infinity;for(const t of g.targets){if(t.done)continue;const dx=t.x-g.player.position.x,dz=t.z-g.player.position.z,dd=Math.hypot(dx,dz);if(dd<d){d=dd;nearest={dx,dz};}}if(nearest&&(g.profile.assist===true||d<28)){const rot=-g.yaw,rx=nearest.dx*Math.cos(rot)-nearest.dz*Math.sin(rot),rz=nearest.dx*Math.sin(rot)+nearest.dz*Math.cos(rot),scale=Math.min(1,44/Math.max(1,Math.hypot(rx,rz)));c.fillStyle='rgba(34,211,238,.8)';c.beginPath();c.arc(m+rx*scale,m+rz*scale,2.5,0,Math.PI*2);c.fill();}}}
+function interactWithPlanetTarget(){const g=planetGame;if(!g||!g.active||g.paused||g.scanBusy||!g.target){if(g&&!g.target)gameNotify('Move closer to a signal or sample site before interacting.');return;}const target=g.target;g.scanBusy=true;const stage=document.getElementById('planetGameStage');stage?.classList.add('scanning');const btn=document.getElementById('planetInteractButton');if(btn)btn.textContent=target.kind==='sample'?'Analyzing…':'Scanning…';gameNotify(target.kind==='sample'?'Spectrometer and collection arm engaged…':'Scanning terrain composition and structure…');setTimeout(()=>{
+    if(!planetGame||planetGame!==g)return;g.scanBusy=false;stage?.classList.remove('scanning');target.done=true;target.mesh?.traverse(o=>{if(o.material?.emissive){o.material.emissive.set(0x00aa77);o.material.emissiveIntensity=.22;}});const p=g.planet;
+    if(target.kind==='sample'){
+      g.samples.push(target.name);const sampleKey=`${p.id}:sample:${g.samples.length-1}`;state.planetSamples=state.planetSamples||[];if(!state.planetSamples.includes(sampleKey)){state.planetSamples.push(sampleKey);saveState();addXP(15,g.mode==='surface'?'Field sample':'Atmospheric reading');}
+      gameNotify(`${g.mode==='surface'?'Sample':'Reading'} ${String(g.samples.length).padStart(2,'0')} logged · ${target.material||'surface material'} · ${target.fact}`);
+    }else{
+      g.scanned.push(target.name);const key=`${p.id}:${target.poiIndex}`;state.planetDiscoveries=state.planetDiscoveries||[];if(!state.planetDiscoveries.includes(key)){state.planetDiscoveries.push(key);saveState();addXP(20,`${p.name} scan`);}
+      gameNotify(`DISCOVERY · ${target.name} — ${target.fact}`);
+    }
+    if(btn)btn.textContent='Interact · E';const mobile=document.getElementById('planetMobileInteract');if(mobile)mobile.textContent='Scan · E';updatePlanetGameHUD();
+  },1100);}
+function completePlanetMission(){const g=planetGame;if(!g||g.complete||g.expired)return;g.complete=true;g.active=false;const p=g.planet;const end=document.getElementById('planetMissionComplete');const summary=document.getElementById('planetEndSummary');if(end)end.classList.add('open');if(summary)summary.textContent=`${g.scanned.length} science scans · ${g.samples.length} ${g.mode==='surface'?'samples':'atmospheric readings'} logged · ${g.profile.label.toLowerCase()}.`;
+  if(!(state.planetMissionsCompleted||[]).includes(p.id)){state.planetMissionsCompleted=state.planetMissionsCompleted||[];state.planetMissionsCompleted.push(p.id);saveState();addXP(g.profile.reward,`${p.name} field mission`);checkBadges();}gameNotify('Mission complete · science log synced to your Aura Cosmos progress.');}
+function continuePlanetMission(){const end=document.getElementById('planetMissionComplete');end?.classList.remove('open');if(planetGame){planetGame.complete=false;planetGame.active=true;}gameNotify('Mission report saved. Continue the survey or return to your ship.');}
+function togglePlanetPause(){const g=planetGame;if(!g)return;g.paused=!g.paused;const menu=document.getElementById('planetPauseMenu');menu?.classList.toggle('open',g.paused);if(!g.paused&&!g.complete)g.active=true;else g.active=false;}
+function showPlanetInventory(title='Field journal'){const g=planetGame;if(!g)return;const p=g.planet,scans=g.scanned.length,samples=g.samples.length;const summary=document.getElementById('planetPauseSummary');const menu=document.getElementById('planetPauseMenu');if(menu){menu.classList.add('open');g.paused=true;g.active=false;}if(summary)summary.textContent=`${title}: ${scans} discoveries — ${g.scanned.join(', ')||'none yet'} · ${samples} ${g.mode==='surface'?'samples':'readings'} — ${g.samples.join(', ')||'none yet'}.`}
+function openGameLearn(){if(planetGame){planetGame.paused=true;planetGame.active=false;}openPlanetLearn();}
+function initPlanetGameScene(p){
+  const host=document.getElementById('planetGameCanvas');if(!host||!window.THREE){gameNotify('WebGL is unavailable. Your browser can still use the mission log, but 3D driving needs a WebGL-capable browser.');return;}
+  const g=planetGame,mode=g.mode,surface=mode==='surface';let renderer,scene,camera,raf,resizeObserver;let disposed=false;let world=null;
+  try{
+    renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.35));renderer.setSize(host.clientWidth||900,host.clientHeight||600,false);renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;host.appendChild(renderer.domElement);
+    scene=new THREE.Scene();const sky=surface?(p.id==='earth'?0x8daac6:p.id==='venus'?0x927458:p.id==='mercury'?0x292a30:0xb45b45):0x090d21;scene.background=new THREE.Color(sky);scene.fog=new THREE.FogExp2(sky,surface?.006:.0021);
+    camera=new THREE.PerspectiveCamera(68,host.clientWidth/(host.clientHeight||600),.1,1400);const hemi=new THREE.HemisphereLight(surface?0xc9deff:0x8eabff,surface?0x4a3025:0x10152b,surface?1.35:.9);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffe8c5,surface?2.5:3.4);sun.position.set(-90,105,70);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;scene.add(sun);
+    const starPos=[];for(let i=0;i<850;i++){const a=Math.random()*Math.PI*2,r=500+Math.random()*300;starPos.push(Math.cos(a)*r,(Math.random()-.5)*350,Math.sin(a)*r);}const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.Float32BufferAttribute(starPos,3));const stars=new THREE.Points(sg,new THREE.PointsMaterial({color:0xd6e4ff,size:1.15,sizeAttenuation:false,transparent:true,opacity:.72}));scene.add(stars);
+    if(surface){
+      const size=360,segments=140,geo=new THREE.PlaneGeometry(size,size,segments,segments);geo.rotateX(-Math.PI/2);const pos=geo.attributes.position;const colors=[];const base=new THREE.Color(p.id==='earth'?0x65594a:p.id==='venus'?0x80634a:p.id==='mercury'?0x625e5b:0x884332);const high=new THREE.Color(p.id==='earth'?0x99958a:p.id==='venus'?0xb08a62:p.id==='mercury'?0xa49c91:0xc58264);const low=new THREE.Color(p.id==='earth'?0x343b37:p.id==='venus'?0x554032:p.id==='mercury'?0x353438:0x4a2b27);
+      for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i),y=planetTerrainHeight(p,x,z);pos.setY(i,y);const c=y>3?high.clone().lerp(base,Math.min(.8,(y-3)/22)):low.clone().lerp(base,Math.max(0,(y+8)/11));colors.push(c.r,c.g,c.b);}pos.needsUpdate=true;geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));geo.computeVertexNormals();const material=new THREE.MeshStandardMaterial({map:planetTexture(p),vertexColors:true,roughness:.96,metalness:0});const terrain=new THREE.Mesh(geo,material);terrain.receiveShadow=true;scene.add(terrain);
+      // Broad irregular ridges frame the horizon without loading terrain assets.
+      const ridgeMat=new THREE.MeshStandardMaterial({color:base.clone().multiplyScalar(.62),roughness:1});for(let r=0;r<3;r++){const group=new THREE.Group();const count=52;for(let i=0;i<count;i++){const angle=(i/count)*Math.PI*2;const radius=150+r*27+Math.sin(i*2.1+r)*18;const height=18+r*13+Math.abs(Math.sin(i*1.73+r))*38;const m=new THREE.Mesh(new THREE.ConeGeometry(15+r*5,height,5),ridgeMat);m.position.set(Math.cos(angle)*radius,height*.43,Math.sin(angle)*radius);m.rotation.y=angle;group.add(m);}scene.add(group);}
+      addTerrainRocks(scene,p);const lander=new THREE.Group();const pad=new THREE.Mesh(new THREE.CylinderGeometry(4.7,5.4,.55,12),new THREE.MeshStandardMaterial({color:0x555b60,metalness:.42,roughness:.7}));pad.position.y=planetTerrainHeight(p,0,32)+.28;lander.add(pad);const legMat=new THREE.MeshStandardMaterial({color:0x8b949a,metalness:.6,roughness:.55});for(let i=0;i<4;i++){const a=i*Math.PI/2;const leg=new THREE.Mesh(new THREE.CylinderGeometry(.11,.16,3,8),legMat);leg.position.set(Math.cos(a)*3.1,pad.position.y+1,Math.sin(a)*3.1);leg.rotation.z=Math.cos(a)*.25;leg.rotation.x=Math.sin(a)*.25;lander.add(leg);}const cabin=new THREE.Mesh(new THREE.CylinderGeometry(1.9,2.3,2.4,10),new THREE.MeshStandardMaterial({color:0xd4d8d5,metalness:.5,roughness:.38}));cabin.position.y=pad.position.y+2.5;lander.add(cabin);lander.position.set(0,0,34);lander.traverse(o=>{if(o.isMesh)o.castShadow=true;});scene.add(lander);
+      g.player=planetVehicle('surface',p.color);g.player.position.set(0,planetTerrainHeight(p,0,20),20);scene.add(g.player);
+      const coords=[[27,-8],[-30,-28],[30,-45]],targetMeshes=[];coords.forEach((v,i)=>{const x=v[0]*g.profile.distance,z=v[1]*g.profile.distance,mesh=createSurfaceLandmark(scene,p,i,x,z);const poi=p.pois[i%p.pois.length];targetMeshes.push({kind:'scan',name:poi.name,fact:poi.fact,poiIndex:i,x,z,position:new THREE.Vector3(x,planetTerrainHeight(p,x,z),z),mesh,done:false,directionHint:'A geological feature is nearby.'});});
+      [[-35,17],[33,30]].forEach((v,i)=>{const x=v[0]*g.profile.distance,z=v[1]*g.profile.distance,mesh=createSampleNode(scene,p,i,x,z);targetMeshes.push({kind:'sample',name:`Field sample ${i+1}`,material:'surface material · simulation',fact:'The sample is a gameplay stand-in; no real composition is claimed.',x,z,position:new THREE.Vector3(x,planetTerrainHeight(p,x,z),z),mesh,done:false,directionHint:'A surface sample is nearby.'});});g.targets=targetMeshes;world=terrain;
+    }else{
+      const env=createAtmosphereWorld(scene,p);world=env.globe;g.player=planetVehicle('flight',p.color);g.player.scale.setScalar(1.2);g.player.position.set(0,29,59);scene.add(g.player);const points=[[0,28,32],[27,12,17],[-25,-8,22],[10,-27,-18],[-23,20,-15]];const targetMeshes=[];points.forEach((v,i)=>{const direction=new THREE.Vector3(v[0],v[1],v[2]).normalize();const pos=direction.clone().multiplyScalar(34+(i%2)*1.2);const group=new THREE.Group();const shell=new THREE.Mesh(new THREE.SphereGeometry(1.7,20,14),new THREE.MeshStandardMaterial({color:i===0&&p.id==='jupiter'?0xdf8164:new THREE.Color(p.color).offsetHSL(0,.08,.13),roughness:.75,emissive:new THREE.Color(p.color),emissiveIntensity:.22}));group.add(shell);const glow=new THREE.Mesh(new THREE.TorusGeometry(2.4,.07,6,24),new THREE.MeshBasicMaterial({color:0x65e8ff,transparent:true,opacity:.72}));group.add(glow);group.position.copy(pos);scene.add(group);const poi=p.pois[i%p.pois.length];targetMeshes.push({kind:'scan',name:i===0&&p.id==='jupiter'?'Great Red Spot transect':poi.name,fact:poi.fact,poiIndex:i%p.pois.length,x:pos.x,z:pos.z,position:pos,mesh:group,done:false,directionHint:'A atmospheric feature is nearby.'});});
+      for(let i=0;i<2;i++){const direction=new THREE.Vector3(i?-.5:.4,i?-.4:.3,i?-.8:-.8).normalize(),pos=direction.clone().multiplyScalar(35);const marker=new THREE.Mesh(new THREE.IcosahedronGeometry(1.15,1),new THREE.MeshStandardMaterial({color:0x8be9ff,emissive:0x128cba,emissiveIntensity:.48,roughness:.4}));marker.position.copy(pos);scene.add(marker);targetMeshes.push({kind:'sample',name:`Atmospheric reading ${i+1}`,material:'remote spectral reading',fact:'Atmospheric composition and winds are inferred by remote sensing; no physical gas sample is collected in this flight simulation.',poiIndex:0,position:pos,mesh:marker,done:false,directionHint:'A sensor waypoint is nearby.'});}
+      g.targets=targetMeshes;
+    }
+    g.startPosition=g.player.position.clone();g.collidables=[];g.yaw=surface?0:0;g.pitch=surface?-.18:-.15;g.elapsed=0;g.lastUpdate=performance.now();
+    const stage=document.getElementById('planetGameStage');const updateSize=()=>{if(!renderer||!stage?.isConnected)return;const w=Math.max(1,host.clientWidth),h=Math.max(1,host.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();};resizeObserver=typeof ResizeObserver!=='undefined'?new ResizeObserver(updateSize):null;resizeObserver?.observe(host);if(!resizeObserver)window.addEventListener('resize',updateSize);
+    const onDown=e=>{if(e.target.closest('button,.planet-game-touch,.planet-game-pause,.planet-game-end'))return;g.lookPointer=e.pointerId;g.lookX=e.clientX;g.lookY=e.clientY;stage.setPointerCapture?.(e.pointerId);};const onMove=e=>{if(e.pointerId!==g.lookPointer)return;const dx=e.clientX-g.lookX,dy=e.clientY-g.lookY;g.lookX=e.clientX;g.lookY=e.clientY;g.yaw-=dx*.0042;g.pitch=Math.max(-.8,Math.min(.45,g.pitch+dy*.0032));};const onUp=e=>{if(e.pointerId===g.lookPointer)g.lookPointer=null;};stage.addEventListener('pointerdown',onDown);stage.addEventListener('pointermove',onMove);stage.addEventListener('pointerup',onUp);stage.addEventListener('pointercancel',onUp);
+    const keyDown=e=>{if(e.key==='Escape'){e.preventDefault();togglePlanetPause();return;}if(!planetGame||planetGame.paused||planetGame.complete)return;const key=e.key.toLowerCase();if(key==='e'){e.preventDefault();interactWithPlanetTarget();return;}if(['w','a','s','d','shift',' ','c'].includes(key)){g.keys[key]=true;if(['w','a','s','d',' '].includes(key))e.preventDefault();}};const keyUp=e=>{if(planetGame)g.keys[e.key.toLowerCase()]=false;};window.addEventListener('keydown',keyDown);window.addEventListener('keyup',keyUp);
+    const joystick=document.getElementById('planetGameTouch'),stick=document.getElementById('planetGameStick');const joyMove=e=>{if(!g.joyPointer||e.pointerId!==g.joyPointer)return;const r=joystick.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,max=r.width*.31,l=Math.hypot(dx,dy)||1,scale=Math.min(1,max/l);g.input.x=dx/l*scale;g.input.y=dy/l*scale;if(stick)stick.style.transform=`translate(${g.input.x*max}px,${g.input.y*max}px)`;};const joyDown=e=>{g.joyPointer=e.pointerId;joystick.setPointerCapture?.(e.pointerId);joyMove(e);};const joyUp=e=>{if(e.pointerId===g.joyPointer){g.joyPointer=null;g.input.x=0;g.input.y=0;if(stick)stick.style.transform='';}};joystick?.addEventListener('pointerdown',joyDown);joystick?.addEventListener('pointermove',joyMove);joystick?.addEventListener('pointerup',joyUp);joystick?.addEventListener('pointercancel',joyUp);
+    const forward=new THREE.Vector3(),right=new THREE.Vector3(),desired=new THREE.Vector3();let lastHud=0;
+    const tick=now=>{if(disposed||planetGame!==g)return;raf=requestAnimationFrame(tick);const dt=Math.min(.05,(now-g.lastUpdate)/1000);g.lastUpdate=now;const active=g.active&&!g.paused&&!g.complete;
+      if(active){const k=g.keys;let f=(k.w?1:0)-(k.s?1:0)-g.input.y,side=(k.d?1:0)-(k.a?1:0)+g.input.x;const mag=Math.hypot(f,side);if(mag>1){f/=mag;side/=mag;}const speed=(k.shift?20:surface?9:12);forward.set(-Math.sin(g.yaw),0,-Math.cos(g.yaw));right.set(Math.cos(g.yaw),0,-Math.sin(g.yaw));desired.set(0,0,0).addScaledVector(forward,f*speed*dt).addScaledVector(right,side*speed*dt);g.player.position.add(desired);
+        if(surface){g.player.position.x=THREE.MathUtils.clamp(g.player.position.x,-158,158);g.player.position.z=THREE.MathUtils.clamp(g.player.position.z,-158,158);g.player.position.y=planetTerrainHeight(p,g.player.position.x,g.player.position.z);g.player.rotation.y=g.yaw+(mag>.1?Math.atan2(side,f):0);}
+        else{if(k[' '])g.player.position.y+=speed*dt;if(k.c)g.player.position.y-=speed*dt;g.player.position.y=THREE.MathUtils.clamp(g.player.position.y,24,80);g.player.rotation.y=g.yaw;g.player.rotation.x=-g.pitch;const radius=g.player.position.length();if(radius<29)g.player.position.setLength(29);if(radius>110)g.player.position.setLength(110);}
+      }
+      if(surface){const offset=new THREE.Vector3(Math.sin(g.yaw)*10,6.4,Math.cos(g.yaw)*10);desired.copy(g.player.position).add(offset);camera.position.lerp(desired,.14);forward.set(-Math.sin(g.yaw),0,-Math.cos(g.yaw));desired.copy(g.player.position).addScaledVector(forward,4).add(new THREE.Vector3(0,1.6+g.pitch*5,0));camera.lookAt(desired);}
+      else{const back=new THREE.Vector3(Math.sin(g.yaw)*12,5+g.pitch*7,Math.cos(g.yaw)*12);desired.copy(g.player.position).add(back);camera.position.lerp(desired,.12);desired.copy(g.player.position).add(new THREE.Vector3(-Math.sin(g.yaw)*4,g.pitch*8,-Math.cos(g.yaw)*4));camera.lookAt(desired);}
+      if(world&&mode==='flight')world.rotation.y+=.0015*dt;stars.rotation.y+=.00008;g.targets?.forEach(t=>{if(t.kind==='sample')t.mesh.rotation.y+=.008;});renderer.render(scene,camera);if(now-lastHud>220){lastHud=now;updatePlanetGameHUD();}
+    };tick(performance.now());
+    g.cleanup=()=>{disposed=true;cancelAnimationFrame(raf);resizeObserver?.disconnect();if(!resizeObserver)window.removeEventListener('resize',updateSize);stage.removeEventListener('pointerdown',onDown);stage.removeEventListener('pointermove',onMove);stage.removeEventListener('pointerup',onUp);stage.removeEventListener('pointercancel',onUp);window.removeEventListener('keydown',keyDown);window.removeEventListener('keyup',keyUp);joystick?.removeEventListener('pointerdown',joyDown);joystick?.removeEventListener('pointermove',joyMove);joystick?.removeEventListener('pointerup',joyUp);joystick?.removeEventListener('pointercancel',joyUp);scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){const mats=Array.isArray(o.material)?o.material:[o.material];mats.forEach(m=>{m.map?.dispose();m.dispose();});}});renderer.dispose();renderer.forceContextLoss?.();};
+  }catch(error){console.error('[planet-game] scene error',error);gameNotify('The 3D world could not be created on this device. Reload the mission in a browser with WebGL enabled.');if(renderer){renderer.dispose();}}
+}
+function cleanupPlanetGame(){if(planetGame?.cleanup)planetGame.cleanup();clearTimeout(planetGame?.messageTimer);planetGame=null;}
+function cleanupPlanetTravelScene(){if(window._planetTravelCleanup){window._planetTravelCleanup();window._planetTravelCleanup=null;}}
 
 checkStreak();
 updateXPUI();
