@@ -926,7 +926,9 @@ function closeFullscreen(){
   runFsCleanups();
   setTimeout(()=>{
     overlay.classList.remove('open','closing');
-    document.getElementById('fsPanel').innerHTML = '';
+    const panel = document.getElementById('fsPanel');
+    panel.innerHTML = '';
+    panel.classList.remove('planet-panel');
     document.body.style.overflow = '';
   }, 260);
 }
@@ -6734,7 +6736,7 @@ function planetTerrainHeight(p,x,z){
   let h=1.25*Math.sin(x*.055)*Math.cos(z*.047)+.72*Math.sin((x+z)*.12)+.42*Math.cos(x*.19-z*.13);
   const crater=(cx,cz,r,depth)=>{const d=Math.hypot(x-cx,z-cz)/r;if(d<1.5){h+=-depth*Math.exp(-d*d*3)+depth*.24*Math.exp(-Math.pow((d-1.02)*8,2));}};
   if(p.id==='mercury'){crater(-22,-12,15,4.5);crater(28,-40,11,3);crater(40,26,18,5);}
-  if(p.id==='mars'){crater(27,-30,17,4);crater(-31,7,13,3.2);h+=14*Math.exp(-((x-32)**2+(z+38)**2)/700);h-=4*Math.exp(-((x+26)/6)**2)*Math.exp(-(z*z)/5000);}
+  if(p.id==='mars'){crater(27,-30,17,4);crater(-31,7,13,3.2);h+=14*Math.exp(-((x-32)**2+(z+38)**2)/700);h-=4*Math.exp(-Math.pow((x+26)/6,2))*Math.exp(-(z*z)/5000);}
   if(p.id==='venus'){h+=12*Math.exp(-((x-30)**2+(z+35)**2)/850);h+=5*Math.exp(-((x+30)**2+(z-12)**2)/500);}
   if(p.id==='earth'){h*=1.2;h+=5*Math.exp(-((x-24)**2+(z+38)**2)/500);}
   return h;
