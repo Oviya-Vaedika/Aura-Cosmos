@@ -86,7 +86,10 @@ function isValidUsername(v) {
 }
 
 function isValidPassword(v) {
-  if (typeof v !== 'string' || v.length < 8 || v.length > 200) return false;
+  if (typeof v !== 'string' || v.length < 8 || v.length > 200) {
+    return false;
+  }
+
   return /[a-zA-Z]/.test(v) && /[0-9]/.test(v);
 }
 
@@ -357,6 +360,17 @@ app.put(
    DUBIS — GEMINI AI PROXY
 =========================================================== */
 
+// Number of times Dubis will try Gemini before giving up.
+const DUBIS_MAX_RETRIES = 3;
+
+// Initial delay between retries.
+// Retry delays will be 1500ms, then 3000ms.
+const DUBIS_RETRY_DELAY_MS = 1500;
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 app.post('/api/dubis', async (req, res) => {
 
   const ip = clientIp(req);
@@ -406,7 +420,7 @@ app.post('/api/dubis', async (req, res) => {
   }
 
 
-  // Convert Anthropic-style messages to Gemini format
+  // Convert Anthropic-style messages to Gemini format.
 
   const contents = messages.map(m => ({
     role: m.role === 'assistant'
@@ -421,131 +435,250 @@ app.post('/api/dubis', async (req, res) => {
   }));
 
 
-  const controller = new AbortController();
-
-  const timeoutId = setTimeout(
-    () => controller.abort(),
-    UPSTREAM_TIMEOUT_MS
-  );
+  const url =
+    `https://generativelanguage.googleapis.com/v1beta/models/` +
+    `${GEMINI_MODEL}:generateContent`;
 
 
-  try {
+  // =========================================================
+  // GEMINI RETRY LOOP
+  // =========================================================
 
-    const url =
-      `https://generativelanguage.googleapis.com/v1beta/models/` +
-      `${GEMINI_MODEL}:generateContent`;
+  for (
+    let attempt = 1;
+    attempt <= DUBIS_MAX_RETRIES;
+    attempt++
+  ) {
 
+    const controller = new AbortController();
 
-    const upstream = await fetch(url, {
-
-      method: 'POST',
-
-      signal: controller.signal,
-
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': GEMINI_API_KEY
-      },
-
-      body: JSON.stringify({
-
-        systemInstruction: {
-          parts: [
-            {
-              text: system
-            }
-          ]
-        },
-
-        contents,
-
-        generationConfig: {
-          maxOutputTokens: 2048
-        }
-
-      })
-
-    });
-
-
-    clearTimeout(timeoutId);
-
-
-    if (!upstream.ok) {
-
-      const errText =
-        await upstream.text().catch(() => '');
-
-      console.error(
-        `[dubis] Gemini upstream error ${upstream.status}:`,
-        errText
-      );
-
-      const status =
-        upstream.status === 429
-          ? 429
-          : 502;
-
-      return res.status(status).json({
-        error: 'The AI service returned an error. Please try again shortly.'
-      });
-    }
-
-
-    const data = await upstream.json();
-
-
-    const reply =
-      data?.candidates?.[0]?.content?.parts
-        ?.map(part => part.text || '')
-        .join('')
-        .trim();
-
-
-    if (!reply) {
-
-      console.error(
-        '[dubis] Gemini returned an unexpected response:',
-        JSON.stringify(data)
-      );
-
-      return res.status(502).json({
-        error: 'The AI service returned an unexpected response.'
-      });
-    }
-
-
-    return res.json({
-      reply
-    });
-
-
-  } catch (err) {
-
-    clearTimeout(timeoutId);
-
-
-    if (err.name === 'AbortError') {
-
-      console.error(
-        '[dubis] Gemini request timed out'
-      );
-
-      return res.status(504).json({
-        error: 'The AI service took too long to respond.'
-      });
-    }
-
-
-    console.error(
-      '[dubis] unexpected Gemini server error:',
-      err
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      UPSTREAM_TIMEOUT_MS
     );
 
-    return res.status(500).json({
-      error: 'Unexpected server error.'
-    });
+    try {
+
+      console.log(
+        `[dubis] Gemini request attempt ${attempt}/${DUBIS_MAX_RETRIES} using ${GEMINI_MODEL}`
+      );
+
+
+      const upstream = await fetch(url, {
+
+        method: 'POST',
+
+        signal: controller.signal,
+
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': GEMINI_API_KEY
+        },
+
+        body: JSON.stringify({
+
+          systemInstruction: {
+            parts: [
+              {
+                text: system
+              }
+            ]
+          },
+
+          contents,
+
+          generationConfig: {
+            maxOutputTokens: 2048
+          }
+
+        })
+
+      });
+
+
+      clearTimeout(timeoutId);
+
+
+      // =====================================================
+      // GEMINI RETURNED AN ERROR
+      // =====================================================
+
+      if (!upstream.ok) {
+
+        const errText =
+          await upstream.text().catch(() => '');
+
+        console.error(
+          `[dubis] Gemini upstream error ${upstream.status} on attempt ${attempt}:`,
+          errText
+        );
+
+
+        // These errors can be temporary, so retry them.
+        const temporaryError =
+          upstream.status === 429 ||
+          upstream.status === 500 ||
+          upstream.status === 502 ||
+          upstream.status === 503 ||
+          upstream.status === 504;
+
+
+        if (
+          temporaryError &&
+          attempt < DUBIS_MAX_RETRIES
+        ) {
+
+          const delay =
+            DUBIS_RETRY_DELAY_MS *
+            Math.pow(2, attempt - 1);
+
+          console.log(
+            `[dubis] Temporary Gemini error ${upstream.status}. ` +
+            `Retrying in ${delay}ms...`
+          );
+
+          await sleep(delay);
+
+          continue;
+        }
+
+
+        const status =
+          upstream.status === 429
+            ? 429
+            : 502;
+
+
+        return res.status(status).json({
+
+          error:
+            upstream.status === 503
+              ? 'Gemini is temporarily overloaded. Please try again in a moment.'
+              : 'The AI service returned an error. Please try again shortly.'
+
+        });
+      }
+
+
+      // =====================================================
+      // GEMINI SUCCESS RESPONSE
+      // =====================================================
+
+      const data = await upstream.json();
+
+
+      const reply =
+        data?.candidates?.[0]?.content?.parts
+          ?.map(part => part.text || '')
+          .join('')
+          .trim();
+
+
+      if (!reply) {
+
+        console.error(
+          '[dubis] Gemini returned an unexpected response:',
+          JSON.stringify(data)
+        );
+
+        return res.status(502).json({
+          error: 'The AI service returned an unexpected response.'
+        });
+      }
+
+
+      console.log(
+        `[dubis] Gemini response succeeded on attempt ${attempt}`
+      );
+
+
+      return res.json({
+        reply
+      });
+
+
+    } catch (err) {
+
+      clearTimeout(timeoutId);
+
+
+      // =====================================================
+      // REQUEST TIMED OUT
+      // =====================================================
+
+      if (err.name === 'AbortError') {
+
+        console.error(
+          `[dubis] Gemini request timed out on attempt ${attempt}`
+        );
+
+
+        if (attempt < DUBIS_MAX_RETRIES) {
+
+          const delay =
+            DUBIS_RETRY_DELAY_MS *
+            Math.pow(2, attempt - 1);
+
+
+          console.log(
+            `[dubis] Retrying after timeout in ${delay}ms...`
+          );
+
+
+          await sleep(delay);
+
+          continue;
+        }
+
+
+        return res.status(504).json({
+          error:
+            'The AI service took too long to respond. Please try again.'
+        });
+      }
+
+
+      // =====================================================
+      // OTHER SERVER/FETCH ERROR
+      // =====================================================
+
+      console.error(
+        '[dubis] unexpected Gemini server error:',
+        err
+      );
+
+
+      if (attempt < DUBIS_MAX_RETRIES) {
+
+        const delay =
+          DUBIS_RETRY_DELAY_MS *
+          Math.pow(2, attempt - 1);
+
+
+        console.log(
+          `[dubis] Retrying after unexpected error in ${delay}ms...`
+        );
+
+
+        await sleep(delay);
+
+        continue;
+      }
+
+
+      return res.status(500).json({
+        error: 'Unexpected server error.'
+      });
+    }
   }
+
+
+  // This should only be reached if every retry failed.
+
+  return res.status(502).json({
+    error:
+      'The AI service is temporarily unavailable. Please try again.'
+  });
 
 });
 
