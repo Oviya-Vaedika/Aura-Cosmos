@@ -532,6 +532,40 @@ p.page-sub{color:var(--text-dim);max-width:640px;font-size:14.5px;line-height:1.
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
 footer.foot{text-align:center;padding:26px;color:var(--text-faint);font-size:11px;font-family:var(--font-mono);letter-spacing:1px;position:relative;z-index:2;}
+
+/* Live Sky visual refresh — luminous observatory HUD */
+#skyFullscreenOverlay{background:radial-gradient(ellipse at 50% 0%,#17133d 0%,#080b20 44%,#02040c 100%);}
+.sky3d-host{isolation:isolate;}
+.sky-fs-hud-top{top:18px;left:18px;right:76px;gap:8px;}
+.sky-chip{padding:7px 11px;border-color:rgba(157,167,255,.22);background:linear-gradient(135deg,rgba(15,20,48,.78),rgba(6,9,24,.7));box-shadow:0 5px 24px rgba(0,0,0,.18);color:#d9e7ff;letter-spacing:.25px;}
+.sky-fs-hint{top:62px;left:18px;transform:none;border:1px solid rgba(166,156,255,.15);color:rgba(222,230,255,.72);background:rgba(7,10,28,.48);padding:7px 12px;}
+.sky-fs-close{width:46px;height:46px;border-color:rgba(163,176,255,.32);background:linear-gradient(145deg,rgba(36,42,84,.8),rgba(8,10,28,.85));box-shadow:0 8px 30px rgba(0,0,0,.25);transition:transform .18s ease,border-color .18s ease;}
+.sky-fs-close:hover{transform:rotate(90deg);border-color:rgba(103,232,249,.65);}
+.sky-fs-info-panel{left:clamp(14px,3vw,34px);bottom:clamp(205px,26vh,260px);right:auto;width:min(330px,calc(100% - 28px));max-width:330px;padding:16px 17px;border-radius:18px;border:1px solid rgba(139,190,255,.3);background:linear-gradient(145deg,rgba(13,20,49,.9),rgba(7,10,28,.84));box-shadow:0 18px 55px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.07);backdrop-filter:blur(18px) saturate(145%);}
+.sky-fs-info-panel .sky-info-kicker{font:9px var(--font-mono);letter-spacing:1.7px;color:#7de8f2;margin-bottom:5px;}
+.sky-fs-info-panel .name{font-size:18px;line-height:1.25;color:#f0f4ff;text-shadow:0 0 22px rgba(125,232,242,.18);margin-bottom:6px;}
+.sky-fs-info-panel .meta{font:11px/1.6 var(--font-mono);color:#b6c3e6;}
+.sky-fs-time-row{bottom:clamp(12px,2.5vh,26px);padding:18px 20px 15px;border-radius:24px;border:1px solid rgba(150,163,255,.28);background:linear-gradient(135deg,rgba(17,22,53,.9),rgba(7,11,30,.88) 65%,rgba(12,16,42,.9));box-shadow:0 24px 90px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.08);}
+.sky-fs-time-row .sky-control-title{font-size:12px;letter-spacing:1.8px;color:#f2f2ff;}
+.sky-fs-time-row .sky-engine-pill{box-shadow:0 0 22px rgba(34,211,238,.06);}
+.sky-fs-time-row .sky-field label{color:#b8bfdf;}
+.sky-fs-time-row input[type=date],.sky-fs-time-row input[type=time]{background:rgba(255,255,255,.065);border-color:rgba(165,173,255,.24);}
+.sky-fs-time-row .note{color:#a9b2d4;}
+.sky-fs-time-row input[type=range]{filter:drop-shadow(0 0 5px rgba(103,232,249,.18));}
+@media(max-width:600px){
+  .sky-fs-hud-top{top:12px;left:12px;right:62px;gap:5px;}
+  .sky-chip{font-size:9px;padding:6px 8px;}
+  .sky-fs-hint{top:68px;left:12px;right:12px;font-size:9px;}
+  .sky-fs-info-panel{left:12px;bottom:clamp(240px,32vh,300px);padding:13px 14px;}
+  .sky-fs-info-panel .name{font-size:16px;}
+  .sky-fs-time-row{left:10px;right:10px;bottom:10px;padding:12px;border-radius:18px;max-width:none;}
+  .sky-fs-time-row .sky-control-heading{margin-bottom:9px;}
+  .sky-fs-time-row .sky-date-controls{gap:7px;}
+  .sky-fs-time-row input[type=date],.sky-fs-time-row input[type=time]{padding:9px 8px;font-size:11px;}
+  .sky-fs-time-row .sky-offset-heading{margin-top:10px;}
+  .sky-fs-time-row .note{font-size:9px;margin-top:6px;}
+}
+
 </style>
 </head>
 <body>
@@ -2505,7 +2539,7 @@ function initSky3D(){
     if(!liveSky.dragging) return;
     const dx = e.clientX - liveSky.lastX, dy = e.clientY - liveSky.lastY;
     liveSky.lastX = e.clientX; liveSky.lastY = e.clientY;
-    if(Math.abs(e.clientX-liveSky.downX) + Math.abs(e.clientY-liveSky.downY) > 6) liveSky.dragMoved = true;
+    if(Math.abs(e.clientX-liveSky.downX) + Math.abs(e.clientY-liveSky.downY) > 10) liveSky.dragMoved = true;
     liveSky.yaw -= dx*0.0055;
     liveSky.pitch -= dy*0.0055;
     liveSky.pitch = Math.max(-1.5, Math.min(0.5, liveSky.pitch));
@@ -2852,22 +2886,38 @@ function sky3DUpdatePositions(f){
 }
 
 function skyIdentifyTap(clientX, clientY){
-  if(!liveSky || !liveSky.camera || !liveSky.raycastTargets) return;
-  const rect = liveSky.host.getBoundingClientRect();
-  const ndc = new THREE.Vector2(
-    ((clientX-rect.left)/rect.width)*2-1,
-    -((clientY-rect.top)/rect.height)*2+1
-  );
-  const raycaster = new THREE.Raycaster();
-  raycaster.params.Sprite = { threshold: 1 };
-  raycaster.setFromCamera(ndc, liveSky.camera);
-  const hits = raycaster.intersectObjects(liveSky.raycastTargets, false);
+  if(!liveSky || !liveSky.camera || !liveSky.raycastTargets || !liveSky.host) return;
   const panel = document.getElementById('skyInfoPanel');
   if(!panel) return;
-  if(!hits.length){ panel.classList.remove('show'); return; }
-  const obj = hits[0].object;
-  const icon = obj.userData.type==='star' ? '✦' : obj.userData.type==='planet' ? '●' : obj.userData.type==='moon' ? '🌙' : '☀️';
-  panel.innerHTML = `<div class="name">${icon} ${obj.userData.name}</div><div class="meta">${obj.userData.meta}</div>`;
+  const rect = liveSky.host.getBoundingClientRect();
+  const clickX = clientX - rect.left, clickY = clientY - rect.top;
+  const candidates = [];
+
+  // Screen-space picking is much more forgiving than Three.js sprite raycasting,
+  // especially on small stars and touch screens. Only consider visible objects.
+  liveSky.raycastTargets.forEach(obj => {
+    if(!obj || !obj.visible || !obj.userData || !obj.userData.name) return;
+    const projected = obj.position.clone().project(liveSky.camera);
+    if(projected.z < -1 || projected.z > 1) return;
+    const x = (projected.x * 0.5 + 0.5) * rect.width;
+    const y = (-projected.y * 0.5 + 0.5) * rect.height;
+    const distance = Math.hypot(x-clickX, y-clickY);
+    const radius = obj.userData.type === 'star' ? 34 : 42;
+    if(distance <= radius) candidates.push({obj, distance, depth: projected.z});
+  });
+
+  // Prefer the nearest visible object to the tap; ties go to the brighter/larger object.
+  candidates.sort((a,b) => a.distance-b.distance || a.depth-b.depth);
+  if(!candidates.length){
+    panel.innerHTML = '<div class="name">✦ Explore the star field</div><div class="meta">Tap closer to a bright named star, planet, Moon or Sun. Faint Milky Way points are decorative background stars and may not have individual catalogue names.</div>';
+    panel.classList.add('show');
+    return;
+  }
+  const obj = candidates[0].obj;
+  const type = obj.userData.type;
+  const icon = type==='star' ? '✦' : type==='planet' ? '◉' : type==='moon' ? '☾' : '☀';
+  const typeLabel = type==='star' ? 'CATALOGUED STAR' : type==='planet' ? 'PLANET' : type==='moon' ? "EARTH'S MOON" : 'THE SUN';
+  panel.innerHTML = `<div class="sky-info-kicker">${typeLabel}</div><div class="name">${icon} ${obj.userData.name}</div><div class="meta">${obj.userData.meta || 'Object in the sky at your selected time and location'}</div>`;
   panel.classList.add('show');
 }
 
