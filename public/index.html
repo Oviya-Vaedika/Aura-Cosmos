@@ -426,8 +426,14 @@ p.page-sub{color:var(--text-dim);max-width:640px;font-size:14.5px;line-height:1.
 .auth-error.show{display:block;}
 .auth-submit-row{display:flex;align-items:center;gap:12px;margin-top:6px;}
 .account-summary{display:flex;align-items:center;gap:14px;padding:6px 0 18px;}
-.account-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--cyan));
-  display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:18px;font-weight:700;color:#0a0a14;flex-shrink:0;}
+.account-avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#f0d9ff,#c8f2ff);
+  display:flex;align-items:center;justify-content:center;font-size:27px;flex-shrink:0;border:1px solid rgba(255,255,255,.45);}
+.avatar-picker{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:8px 0 16px;}
+.avatar-option{aspect-ratio:1;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.035);font-size:25px;display:flex;align-items:center;justify-content:center;transition:transform .15s,border-color .15s,background .15s;}
+.avatar-option:hover{transform:translateY(-2px);border-color:var(--cyan);}
+.avatar-option.selected{border-color:var(--cyan);background:rgba(103,232,249,.13);box-shadow:0 0 0 2px rgba(103,232,249,.16);}
+.avatar-category{font-size:10px;letter-spacing:1.2px;color:var(--text-dim);margin:10px 0 4px;}
+@media(max-width:420px){.avatar-picker{grid-template-columns:repeat(5,minmax(0,1fr));}.modal-box{padding:20px;}}
 .account-name{font-family:var(--font-display);font-size:15px;letter-spacing:0.5px;}
 .account-email{font-size:11.5px;color:var(--text-dim);font-family:var(--font-mono);margin-top:2px;}
 .sync-status{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--text-dim);margin:14px 0;font-family:var(--font-mono);}
@@ -5843,7 +5849,7 @@ routes.profile = function(){
 })();
 
 /* =========================================================
-   Dubis — Claude-powered learning companion
+   Dubis — Gemini-powered learning companion
    ========================================================= */
 let aiHistory = [];
 function toggleAI(){
@@ -6021,7 +6027,7 @@ function checkStreak(){
 /* =========================================================
    Account / Auth / Cloud Progress Sync
    ========================================================= */
-const authState = { loggedIn:false, user:null, syncing:false, lastSyncedAt:null };
+const authState = { loggedIn:false, user:null, syncing:false, syncError:false, lastSyncedAt:null };
 let cloudSyncTimer = null;
 let authFormError = '';
 
@@ -6061,7 +6067,7 @@ function updateAccountButton(){
   const btn = document.getElementById('accountBtn');
   if(!btn) return;
   if(authState.loggedIn && authState.user){
-    btn.textContent = authState.user.username.charAt(0).toUpperCase();
+    btn.textContent = authState.user.avatar || '🐱';
     btn.classList.add('signed-in');
     btn.title = authState.user.username;
   } else {
@@ -6086,6 +6092,18 @@ function togglePasswordVisibility(inputId, btn){
   btn.textContent = showing ? '👁️' : '🙈';
 }
 
+const AVATAR_CHOICES = ['🐱','🐰','🐻','🐼','🦊','🐸','🐨','🐹','🐧','🦄','🐶','🐣','🦋','🐢','🐳','🍓','🍑','🍒','🍉','🍊','🍰','🍩','🧋','🍪','🍙','🥑','👩🏻‍🚀','👨🏽‍🚀','🧑🏻‍🎨','👩🏽‍🔬','🧑🏼‍🚀','👨🏻‍🎓','🌷','🌙','⭐','🪐'];
+let selectedAvatar = '🐱';
+function renderAvatarOptions(items, selected){
+  return items.map((avatar, i) => `<button type="button" class="avatar-option ${avatar===selected?'selected':''}" data-avatar="${avatar}" aria-label="Choose avatar ${i+1}" onclick="selectAuthAvatar(this)">${avatar}</button>`).join('');
+}
+function selectAuthAvatar(button){
+  selectedAvatar = button.dataset.avatar;
+  const hidden = document.getElementById('authAvatar');
+  if(hidden) hidden.value = selectedAvatar;
+  document.querySelectorAll('.avatar-option').forEach(el=>el.classList.toggle('selected', el.dataset.avatar===selectedAvatar));
+}
+
 function renderAuthForm(mode, isWelcome){
   authFormError = '';
   const headline = isWelcome ? 'Welcome to Aura Cosmos' : (mode==='login' ? 'Welcome back' : 'Create your account');
@@ -6106,10 +6124,20 @@ function renderAuthForm(mode, isWelcome){
       <div class="auth-field">
         <label>USERNAME</label>
         <input type="text" id="authUsername" autocomplete="username" placeholder="cosmic_cadet" maxlength="20">
+      </div>
+      <div class="auth-field">
+        <label>CHOOSE YOUR AVATAR</label>
+        <div class="avatar-category">PASTEL ANIMALS</div>
+        <div class="avatar-picker">${renderAvatarOptions(['🐱','🐰','🐻','🐼','🦊','🐸','🐨','🐹','🐧','🦄','🐶','🐣','🦋','🐢','🐳'],'🐱')}</div>
+        <div class="avatar-category">SWEET TREATS & FRUITS</div>
+        <div class="avatar-picker">${renderAvatarOptions(['🍓','🍑','🍒','🍉','🍊','🍰','🍩','🧋','🍪','🍙','🥑'],'🐱')}</div>
+        <div class="avatar-category">PEOPLE & COSMIC VIBES</div>
+        <div class="avatar-picker">${renderAvatarOptions(['👩🏻‍🚀','👨🏽‍🚀','🧑🏻‍🎨','👩🏽‍🔬','🧑🏼‍🚀','👨🏻‍🎓','🌷','🌙','⭐','🪐'],'🐱')}</div>
+        <input type="hidden" id="authAvatar" value="🐱">
       </div>` : ''}
       <div class="auth-field">
-        <label>${mode==='login' ? 'EMAIL OR USERNAME' : 'EMAIL'}</label>
-        <input type="${mode==='login'?'text':'email'}" id="authIdentifier" autocomplete="${mode==='login'?'username':'email'}" placeholder="you@example.com">
+        <label>EMAIL</label>
+        <input type="email" id="authIdentifier" autocomplete="email" placeholder="you@example.com" required>
       </div>
       <div class="auth-field">
         <label>PASSWORD</label>
@@ -6133,6 +6161,12 @@ function renderAuthForm(mode, isWelcome){
     ${isWelcome ? `<button class="btn ghost small" style="margin-top:12px;width:100%;" onclick="closeModal()">Continue as Guest</button>` : ''}
     <p style="font-size:10.5px;color:var(--text-faint);margin-top:16px;line-height:1.5;">Your password is hashed with bcrypt and never stored in plain text or sent to anyone else. You can keep exploring without an account — progress saves locally either way.</p>
   `);
+  if(mode==='signup') {
+    selectedAvatar = '🐱';
+    const hidden = document.getElementById('authAvatar');
+    if(hidden) hidden.value = selectedAvatar;
+    document.querySelectorAll('.avatar-option').forEach(el=>el.classList.toggle('selected', el.dataset.avatar===selectedAvatar));
+  }
 }
 
 function showAuthError(msg){
@@ -6154,6 +6188,7 @@ async function submitSignup(){
   const email = document.getElementById('authIdentifier').value.trim();
   const password = document.getElementById('authPassword').value;
   const passwordConfirm = document.getElementById('authPasswordConfirm').value;
+  const avatar = document.getElementById('authAvatar')?.value || '🐱';
   document.getElementById('authError').classList.remove('show');
 
   if(!username || !email || !password || !passwordConfirm){ showAuthError('Please fill in every field.'); return; }
@@ -6167,7 +6202,7 @@ async function submitSignup(){
     const res = await fetch('/api/auth/signup', {
       method:'POST', credentials:'same-origin',
       headers:{'Content-Type':'application/json','X-Requested-With':'AuraCosmos'},
-      body: JSON.stringify({username, email, password})
+      body: JSON.stringify({username, email, password, avatar})
     });
     const data = await res.json().catch(()=>({}));
     if(!res.ok){ setAuthBusy(false); showAuthError(data.error || 'Could not create your account.'); return; }
@@ -6189,7 +6224,7 @@ async function submitLogin(){
   const password = document.getElementById('authPassword').value;
   document.getElementById('authError').classList.remove('show');
 
-  if(!identifier || !password){ showAuthError('Please enter your email/username and password.'); return; }
+  if(!identifier || !password){ showAuthError('Please enter your email and password.'); return; }
   setAuthBusy(true, 'Signing in…');
   try{
     const res = await fetch('/api/auth/login', {
@@ -6224,18 +6259,19 @@ async function logoutAccount(){
 
 function renderAccountSummary(){
   const u = authState.user;
-  const initial = u.username.charAt(0).toUpperCase();
+  const avatar = u.avatar || '🐱';
   const lastSync = authState.lastSyncedAt ? new Date(authState.lastSyncedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : 'just now';
   openModal(`
     <div class="eyebrow">Account</div>
     <div class="account-summary">
-      <div class="account-avatar">${initial}</div>
+      <div class="account-avatar">${avatar}</div>
       <div>
         <div class="account-name">${escapeHtml(u.username)}</div>
         <div class="account-email">${escapeHtml(u.email)}</div>
       </div>
     </div>
     <div class="sync-status"><span class="sync-dot" id="syncDot"></span><span id="syncStatusText">Cloud sync active · last synced ${lastSync}</span></div>
+    <button class="btn ghost small" style="width:100%;margin-bottom:12px;" onclick="renderAvatarEditor()">Change avatar ✨</button>
     <div class="stat-grid">
       <div class="glass stat-box"><div class="num">${state.xp}</div><div class="lbl">TOTAL XP</div></div>
       <div class="glass stat-box"><div class="num">LV.${getLevel()}</div><div class="lbl">LEVEL</div></div>
@@ -6250,6 +6286,7 @@ function renderAccountSummary(){
 async function pushCloudProgress(silent){
   if(!authState.loggedIn) return;
   authState.syncing = true;
+  authState.syncError = false;
   updateSyncIndicator();
   try{
     const res = await fetch('/api/progress', {
@@ -6259,9 +6296,14 @@ async function pushCloudProgress(silent){
     });
     if(res.ok){
       authState.lastSyncedAt = Date.now();
+      authState.syncError = false;
+    } else {
+      authState.syncError = true;
+      console.warn('[cloud-sync] save failed:', res.status);
     }
   }catch(e){
-    // silent — next successful save will retry via scheduleCloudSync
+    authState.syncError = true;
+    console.warn('[cloud-sync] network error; progress remains on this device until the next successful sync.');
   }
   authState.syncing = false;
   updateSyncIndicator();
@@ -6294,12 +6336,40 @@ async function pullCloudProgressWithMergeCheck(){
   if(!cloudHasContent){
     return; // nothing to adopt either way
   }
-  if(cloudHasContent && localHasContent && (state.xp||0) > (cloud.xp||0) + 20){
+  if(cloudHasContent && localHasContent && progressFingerprint(state) !== progressFingerprint(cloud)){
     // both have real, differing progress — let the person choose rather than silently discarding either
     showProgressMergeChoice(cloud);
     return;
   }
   adoptCloudProgress(cloud);
+}
+
+function progressFingerprint(value){
+  const normalize = v => {
+    if(Array.isArray(v)) return v.map(normalize);
+    if(v && typeof v==='object') {
+      const out={};
+      Object.keys(v).filter(k=>k!=='updatedAt').sort().forEach(k=>out[k]=normalize(v[k]));
+      return out;
+    }
+    return v;
+  };
+  return JSON.stringify(normalize(value || {}));
+}
+
+function renderAvatarEditor(){
+  const current = authState.user?.avatar || '🐱';
+  openModal(`<div class="eyebrow">Your cosmic identity</div><h2>Pick a new avatar</h2><div class="m-sub">Choose a cute little face for your profile.</div><div class="avatar-picker">${renderAvatarOptions(AVATAR_CHOICES,current)}</div><div class="auth-error" id="avatarError"></div><button class="btn" style="width:100%" onclick="saveAvatarChoice()">Save avatar ✨</button>`);
+  selectedAvatar = current;
+  document.querySelectorAll('.avatar-option').forEach(el=>el.classList.toggle('selected', el.dataset.avatar===selectedAvatar));
+}
+async function saveAvatarChoice(){
+  try{
+    const res=await fetch('/api/auth/avatar',{method:'PATCH',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Requested-With':'AuraCosmos'},body:JSON.stringify({avatar:selectedAvatar})});
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok){const el=document.getElementById('avatarError');if(el){el.textContent=data.error||'Could not update avatar.';el.classList.add('show');}return;}
+    authState.user=data.user;updateAccountButton();renderAccountSummary();showToast('Avatar updated! ✨');
+  }catch(e){const el=document.getElementById('avatarError');if(el){el.textContent='Could not reach the server. Try again.';el.classList.add('show');}}
 }
 
 function adoptCloudProgress(cloud){
@@ -6343,8 +6413,15 @@ function updateSyncIndicator(){
   if(authState.syncing){
     dot.classList.add('syncing');
     text.textContent = 'Syncing…';
+  } else if(authState.syncError){
+    dot.classList.remove('syncing');
+    dot.style.background='var(--danger)';
+    dot.style.boxShadow='0 0 6px var(--danger)';
+    text.textContent = 'Cloud save failed · this device still has your latest progress';
   } else {
     dot.classList.remove('syncing');
+    dot.style.background='var(--good)';
+    dot.style.boxShadow='0 0 6px var(--good)';
     const t = authState.lastSyncedAt ? new Date(authState.lastSyncedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : 'just now';
     text.textContent = `Cloud sync active · last synced ${t}`;
   }
