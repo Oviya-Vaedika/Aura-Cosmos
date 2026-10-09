@@ -357,11 +357,31 @@ p.page-sub{color:var(--text-dim);max-width:640px;font-size:14.5px;line-height:1.
 .sky-fs-info-panel.show{transform:translateY(0);opacity:1;}
 .sky-fs-info-panel .name{font-family:var(--font-display);font-size:14px;color:var(--cyan);margin-bottom:3px;}
 .sky-fs-info-panel .meta{color:var(--text-dim);font-family:var(--font-mono);font-size:10.5px;}
-.sky-fs-time-row{position:absolute;left:16px;right:16px;bottom:16px;z-index:5;background:rgba(6,6,16,0.72);
-  backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:14px;padding:12px 16px;}
-.sky-fs-time-row .row{display:flex;align-items:center;gap:10px;}
-.sky-fs-time-row input[type=range]{flex:1;accent-color:var(--cyan);}
-.sky-fs-time-row .note{font-size:10px;color:var(--text-faint);margin-top:8px;line-height:1.4;}
+.sky-fs-time-row{position:absolute;left:clamp(12px,3vw,32px);right:clamp(12px,3vw,32px);bottom:clamp(12px,2.5vh,26px);z-index:5;
+  background:linear-gradient(135deg,rgba(14,17,42,.86),rgba(9,10,27,.76));backdrop-filter:blur(22px) saturate(150%);
+  border:1px solid rgba(164,150,255,.26);box-shadow:0 18px 60px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.06);
+  border-radius:22px;padding:16px 18px;max-width:920px;margin:0 auto;}
+.sky-fs-time-row .sky-control-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.sky-fs-time-row .sky-control-title{font-family:var(--font-display);font-size:11px;letter-spacing:1.5px;color:#e9e7ff;text-transform:uppercase;}
+.sky-fs-time-row .sky-engine-pill{font:10px var(--font-mono);color:#8df2f0;background:rgba(34,211,238,.09);border:1px solid rgba(34,211,238,.22);border-radius:999px;padding:5px 9px;white-space:nowrap;}
+.sky-fs-time-row .sky-date-controls{display:grid;grid-template-columns:minmax(120px,1fr) minmax(110px,.8fr) auto;gap:9px;align-items:end;}
+.sky-fs-time-row .sky-field{display:flex;flex-direction:column;gap:5px;min-width:0;}
+.sky-fs-time-row .sky-field label{font:9px var(--font-mono);letter-spacing:1px;text-transform:uppercase;color:#aaa8d0;}
+.sky-fs-time-row input[type=date],.sky-fs-time-row input[type=time]{width:100%;min-width:0;color:#f5f3ff;background:rgba(255,255,255,.055);border:1px solid rgba(175,166,255,.22);border-radius:11px;padding:10px 11px;font:12px var(--font-mono);color-scheme:dark;outline:none;}
+.sky-fs-time-row input[type=date]:focus,.sky-fs-time-row input[type=time]:focus{border-color:rgba(34,211,238,.7);box-shadow:0 0 0 3px rgba(34,211,238,.08);}
+.sky-fs-now{padding:10px 14px;border:1px solid rgba(34,211,238,.28);border-radius:11px;background:linear-gradient(135deg,rgba(34,211,238,.16),rgba(139,92,246,.18));font:10px var(--font-mono);color:#c9fbff;white-space:nowrap;transition:transform .18s ease,background .18s ease;}
+.sky-fs-now:hover{transform:translateY(-1px);background:linear-gradient(135deg,rgba(34,211,238,.25),rgba(139,92,246,.26));}
+.sky-fs-time-row .sky-offset-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;font:10px var(--font-mono);color:#b5b4d8;}
+.sky-fs-time-row .sky-offset-value{color:#8df2f0;}
+.sky-fs-time-row .row{display:flex;align-items:center;gap:10px;margin-top:7px;}
+.sky-fs-time-row .row span{font:9px var(--font-mono);color:#9291b8;white-space:nowrap;}
+.sky-fs-time-row input[type=range]{flex:1;accent-color:#67e8f9;cursor:pointer;}
+.sky-fs-time-row .note{font-size:10px;color:#9694b9;margin-top:9px;line-height:1.5;}
+@media(max-width:600px){.sky-fs-hint{top:58px;left:12px;right:12px;transform:none;text-align:left;max-width:calc(100% - 24px);}
+  .sky-fs-time-row{padding:13px;border-radius:18px;}.sky-fs-time-row .sky-date-controls{grid-template-columns:1fr 1fr;}
+  .sky-fs-time-row .sky-now-wrap{grid-column:1/-1;}.sky-fs-time-row .sky-fs-now{width:100%;}
+  .sky-fs-time-row .sky-control-heading{align-items:flex-start;}.sky-fs-time-row .sky-engine-pill{font-size:9px;}}
+
 .sky-home-card{padding:24px;display:flex;flex-direction:column;gap:12px;cursor:pointer;transition:transform .25s ease;}
 .sky-home-card:hover{transform:translateY(-3px);}
 .sky-home-card .icon{font-size:30px;}
@@ -426,14 +446,8 @@ p.page-sub{color:var(--text-dim);max-width:640px;font-size:14.5px;line-height:1.
 .auth-error.show{display:block;}
 .auth-submit-row{display:flex;align-items:center;gap:12px;margin-top:6px;}
 .account-summary{display:flex;align-items:center;gap:14px;padding:6px 0 18px;}
-.account-avatar{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#f0d9ff,#c8f2ff);
-  display:flex;align-items:center;justify-content:center;font-size:27px;flex-shrink:0;border:1px solid rgba(255,255,255,.45);}
-.avatar-picker{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin:8px 0 16px;}
-.avatar-option{aspect-ratio:1;border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.035);font-size:25px;display:flex;align-items:center;justify-content:center;transition:transform .15s,border-color .15s,background .15s;}
-.avatar-option:hover{transform:translateY(-2px);border-color:var(--cyan);}
-.avatar-option.selected{border-color:var(--cyan);background:rgba(103,232,249,.13);box-shadow:0 0 0 2px rgba(103,232,249,.16);}
-.avatar-category{font-size:10px;letter-spacing:1.2px;color:var(--text-dim);margin:10px 0 4px;}
-@media(max-width:420px){.avatar-picker{grid-template-columns:repeat(5,minmax(0,1fr));}.modal-box{padding:20px;}}
+.account-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--cyan));
+  display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:18px;font-weight:700;color:#0a0a14;flex-shrink:0;}
 .account-name{font-family:var(--font-display);font-size:15px;letter-spacing:0.5px;}
 .account-email{font-size:11.5px;color:var(--text-dim);font-family:var(--font-mono);margin-top:2px;}
 .sync-status{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--text-dim);margin:14px 0;font-family:var(--font-mono);}
@@ -591,6 +605,7 @@ footer.foot{text-align:center;padding:26px;color:var(--text-faint);font-size:11p
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 <script>
 /* =========================================================
    AURA COSMOS — application script
@@ -2195,7 +2210,7 @@ function openLiveSky(){
   const overlay = ensureSkyOverlay();
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
-  liveSky = { stage:'permission', lat:null, lon:null, timeOffsetHours:0, raf:null, updateInterval:null };
+  liveSky = { stage:'permission', lat:null, lon:null, timeOffsetHours:0, customDateTime:false, selectedDateTime:null, raf:null, updateInterval:null };
   renderSkyPermissionStage();
 }
 
@@ -2276,21 +2291,35 @@ function startSkyView(){
       <div class="sky-fs-hud-top">
         <span class="sky-chip" id="skyTimeChip">—</span>
         <span class="sky-chip" id="skyLocChip">—</span>
+        <span class="sky-chip" id="skyPrecisionChip">✦ Astronomy Engine</span>
       </div>
       <div class="sky-fs-hint">drag to look around · tap a star or planet to identify it</div>
       <div class="sky-fs-info-panel" id="skyInfoPanel"></div>
     </div>
     <div class="sky-fs-time-row">
-      <div class="row">
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);">−12h</span>
-        <input type="range" id="skyTimeSlider" min="-12" max="12" step="0.25" value="0" oninput="skyTimeChanged()">
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);">+12h</span>
+      <div class="sky-control-heading">
+        <div class="sky-control-title">✦ Sky time machine</div>
+        <div class="sky-engine-pill" id="skyEnginePill">${typeof Astronomy !== 'undefined' ? 'PRECISION EPHEMERIS' : 'FALLBACK EPHEMERIS'}</div>
       </div>
-      <div class="note">Drag the slider to preview the sky at other times today.</div>
+      <div class="sky-date-controls">
+        <div class="sky-field"><label for="skyDateInput">Date</label><input type="date" id="skyDateInput" onchange="skySelectedDateChanged()"></div>
+        <div class="sky-field"><label for="skyClockInput">Local time</label><input type="time" id="skyClockInput" step="60" onchange="skySelectedDateChanged()"></div>
+        <div class="sky-now-wrap"><button class="sky-fs-now" type="button" onclick="skyResetToNow()">◎ NOW</button></div>
+      </div>
+      <div class="sky-offset-heading"><span>Time travel offset</span><span class="sky-offset-value" id="skyOffsetValue">+00:00</span></div>
+      <div class="row">
+        <span>−12h</span><input type="range" id="skyTimeSlider" min="-12" max="12" step="0.25" value="0" oninput="skyTimeChanged()"><span>+12h</span>
+      </div>
+      <div class="note">Choose a date and time, then use the slider to travel ±12 hours. Times use your device's local time zone. Star positions are based on the built-in star catalogue.</div>
     </div>
   `;
+  skyWriteDateTimeInputs(new Date());
+  const enginePill=document.getElementById('skyEnginePill');
+  if(enginePill) enginePill.textContent=(typeof Astronomy!=='undefined' && Astronomy.Equator)?'ASTRONOMY ENGINE':'APPROXIMATE MODE';
+  const precisionChip=document.getElementById('skyPrecisionChip');
+  if(precisionChip) precisionChip.textContent=(typeof Astronomy!=='undefined' && Astronomy.Equator)?'✦ Precision ephemeris':'✦ Approximate ephemeris';
   initSky3D();
-  liveSky.updateInterval = setInterval(skyRecomputeAndDraw, 5000);
+  liveSky.updateInterval = setInterval(skyRecomputeAndDraw, 15000);
   skyRecomputeAndDraw();
   completeDiscovery('livesky','🌃 Discovery logged — Sky Watcher badge earned');
 }
@@ -2618,29 +2647,123 @@ function skyDrawMoonPhase(ctx, cx, cy, r, illum, waxing){
   ctx.restore();
 }
 
+function skyPad2(n){ return String(n).padStart(2,'0'); }
+function skyWriteDateTimeInputs(date){
+  const d=document.getElementById('skyDateInput'), t=document.getElementById('skyClockInput');
+  if(d) d.value=`${date.getFullYear()}-${skyPad2(date.getMonth()+1)}-${skyPad2(date.getDate())}`;
+  if(t) t.value=`${skyPad2(date.getHours())}:${skyPad2(date.getMinutes())}`;
+}
+function skySelectedDateChanged(){
+  if(!liveSky) return;
+  const d=document.getElementById('skyDateInput'), t=document.getElementById('skyClockInput');
+  if(!d || !t || !d.value || !t.value) return;
+  const parsed=new Date(`${d.value}T${t.value}:00`);
+  if(Number.isNaN(parsed.getTime())){ showToast('Please choose a valid date and time.'); return; }
+  liveSky.customDateTime=true;
+  liveSky.selectedDateTime=parsed;
+  const slider=document.getElementById('skyTimeSlider'); if(slider) slider.value='0';
+  liveSky.timeOffsetHours=0;
+  skyTimeChanged();
+}
+function skyResetToNow(){
+  if(!liveSky) return;
+  liveSky.customDateTime=false; liveSky.selectedDateTime=null; liveSky.timeOffsetHours=0;
+  const slider=document.getElementById('skyTimeSlider'); if(slider) slider.value='0';
+  skyWriteDateTimeInputs(new Date());
+  skyTimeChanged();
+}
+function skyGetEffectiveDate(){
+  const base=liveSky.customDateTime && liveSky.selectedDateTime ? liveSky.selectedDateTime : new Date();
+  return new Date(base.getTime()+liveSky.timeOffsetHours*3600000);
+}
+function skyTimeChanged(){
+  if(!liveSky) return;
+  const slider=document.getElementById('skyTimeSlider');
+  liveSky.timeOffsetHours=slider ? parseFloat(slider.value) : 0;
+  const label=document.getElementById('skyOffsetValue');
+  if(label){const m=Math.round(Math.abs(liveSky.timeOffsetHours)*60);label.textContent=`${liveSky.timeOffsetHours<0?'−':'+'}${skyPad2(Math.floor(m/60))}:${skyPad2(m%60)}`;}
+  skyRecomputeAndDraw();
+}
+function skyAccurateHorizontal(body, date){
+  if(typeof Astronomy==='undefined' || !Astronomy.Equator || !Astronomy.Horizon) return null;
+  try{
+    const observer=new Astronomy.Observer(liveSky.lat,liveSky.lon,0);
+    const eq=Astronomy.Equator(body,date,observer,true,true);
+    const hz=Astronomy.Horizon(date,observer,eq.ra,eq.dec,'normal');
+    return {alt:hz.altitude,az:hz.azimuth,dist:eq.dist};
+  }catch(err){ console.warn('[Live Sky] Precision ephemeris unavailable; using fallback calculations.',err); return null; }
+}
+function skyAccurateStarPositions(stars,date){
+  if(typeof Astronomy==='undefined' || !Astronomy.DefineStar || !Astronomy.Body || !Astronomy.Equator || !Astronomy.Horizon) return null;
+  try{
+    const observer=new Astronomy.Observer(liveSky.lat,liveSky.lon,0);
+    const slots=[Astronomy.Body.Star1,Astronomy.Body.Star2,Astronomy.Body.Star3,Astronomy.Body.Star4,
+      Astronomy.Body.Star5,Astronomy.Body.Star6,Astronomy.Body.Star7,Astronomy.Body.Star8];
+    const positions=new Array(stars.length);
+    for(let base=0;base<stars.length;base+=slots.length){
+      const count=Math.min(slots.length,stars.length-base);
+      for(let j=0;j<count;j++) Astronomy.DefineStar(slots[j],stars[base+j].ra,stars[base+j].de,1000);
+      for(let j=0;j<count;j++){
+        const eq=Astronomy.Equator(slots[j],date,observer,true,true);
+        const hz=Astronomy.Horizon(date,observer,eq.ra,eq.dec,'normal');
+        positions[base+j]={alt:hz.altitude,az:hz.azimuth};
+      }
+    }
+    return positions;
+  }catch(err){ console.warn('[Live Sky] Star catalogue fallback in use.',err); return null; }
+}
+
+function skyAccurateMoonPhase(date){
+  if(typeof Astronomy==='undefined' || !Astronomy.MoonPhase) return null;
+  try{
+    const phaseAngle=skyNorm360(Astronomy.MoonPhase(date));
+    const illum=(1-Math.cos(skyDeg2rad(phaseAngle)))/2;
+    let name;
+    if(phaseAngle<22.5||phaseAngle>=337.5) name='New Moon';
+    else if(phaseAngle<67.5) name='Waxing Crescent';
+    else if(phaseAngle<112.5) name='First Quarter';
+    else if(phaseAngle<157.5) name='Waxing Gibbous';
+    else if(phaseAngle<202.5) name='Full Moon';
+    else if(phaseAngle<247.5) name='Waning Gibbous';
+    else if(phaseAngle<292.5) name='Last Quarter';
+    else name='Waning Crescent';
+    return {illum,waxing:phaseAngle<180,name};
+  }catch(err){ return null; }
+}
+
 function skyRecomputeAndDraw(){
   if(!liveSky || liveSky.lat===null || !liveSky.scene) return;
-  const effDate = new Date(Date.now() + liveSky.timeOffsetHours*3600*1000);
+  const effDate = skyGetEffectiveDate();
   const d = skyDayNumber(effDate);
   const sun = skyComputeSun(d);
-  const lst = skyLST(d, effDate, liveSky.lon, sun);
+  const lst = (typeof Astronomy !== 'undefined' && Astronomy.SiderealTime)
+    ? skyNorm360(Astronomy.SiderealTime(effDate)*15 + liveSky.lon)
+    : skyLST(d, effDate, liveSky.lon, sun);
 
+  const precisionAvailable = typeof Astronomy !== 'undefined' && !!Astronomy.Equator && !!Astronomy.Horizon;
   const sunEq = skyEclipticToEquatorial(sun.xs, sun.ys, 0, d);
-  const sunAltAz = skyAltAz(sunEq.ra, sunEq.dec, liveSky.lat, lst);
+  const fallbackSunAltAz = skyAltAz(sunEq.ra, sunEq.dec, liveSky.lat, lst);
+  const sunAltAz = skyAccurateHorizontal((typeof Astronomy !== 'undefined' && Astronomy.Body) ? Astronomy.Body.Sun : 'Sun', effDate) || fallbackSunAltAz;
 
   const moon = skyComputeMoon(d, sun);
-  const moonAltAz = skyAltAz(moon.ra, moon.dec, liveSky.lat, lst);
-  const phase = skyMoonPhase(moon, sun);
+  const fallbackMoonAltAz = skyAltAz(moon.ra, moon.dec, liveSky.lat, lst);
+  const moonAltAz = skyAccurateHorizontal((typeof Astronomy !== 'undefined' && Astronomy.Body) ? Astronomy.Body.Moon : 'Moon', effDate) || fallbackMoonAltAz;
+  const phase = skyAccurateMoonPhase(effDate) || skyMoonPhase(moon, sun);
+  const moonDistance = (skyAccurateHorizontal((typeof Astronomy !== 'undefined' && Astronomy.Body) ? Astronomy.Body.Moon : 'Moon', effDate) || {}).dist || moon.dist;
 
   const planetBodies = {};
+  const astroBodyNames = {mercury:'Mercury',venus:'Venus',mars:'Mars',jupiter:'Jupiter',saturn:'Saturn',uranus:'Uranus',neptune:'Neptune'};
   Object.keys(SKY_PLANET_ELEMENTS).forEach(key=>{
     const p = skyComputePlanet(key, d, sun);
-    const altaz = skyAltAz(p.ra, p.dec, liveSky.lat, lst);
-    planetBodies[key] = {dist:p.dist, alt:altaz.alt, az:altaz.az};
+    const fallbackAltAz = skyAltAz(p.ra, p.dec, liveSky.lat, lst);
+    const accurate = skyAccurateHorizontal((typeof Astronomy !== 'undefined' && Astronomy.Body) ? Astronomy.Body[astroBodyNames[key]] : astroBodyNames[key], effDate);
+    const altaz = accurate || fallbackAltAz;
+    planetBodies[key] = {dist:accurate && Number.isFinite(accurate.dist) ? accurate.dist : p.dist, alt:altaz.alt, az:altaz.az};
   });
 
-  const starBodies = SKY_STARS.map(s=>{
-    const altaz = skyAltAz(s.ra, s.de, liveSky.lat, lst);
+  const accurateStars = precisionAvailable ? skyAccurateStarPositions(SKY_STARS,effDate) : null;
+  const starBodies = SKY_STARS.map((s,index)=>{
+    const altaz = (accurateStars && accurateStars[index]) || skyAltAz(s.ra, s.de, liveSky.lat, lst);
     return {n:s.n, c:s.c, m:s.m, alt:altaz.alt, az:altaz.az};
   });
 
@@ -2651,14 +2774,16 @@ function skyRecomputeAndDraw(){
 
   const frame = {
     sunAlt: sunAltAz.alt, sunAz: sunAltAz.az,
-    moonAlt: moonAltAz.alt, moonAz: moonAltAz.az, moonPhase: phase, moonDist: moon.dist,
-    planets: planetBodies, stars: starBodies, milkyWay: milkyWayBodies, effDate
+    moonAlt: moonAltAz.alt, moonAz: moonAltAz.az, moonPhase: phase, moonDist: moonDistance,
+    planets: planetBodies, stars: starBodies, milkyWay: milkyWayBodies, effDate, precisionAvailable
   };
   liveSky.frame = frame;
 
   const timeChip = document.getElementById('skyTimeChip');
   const locChip = document.getElementById('skyLocChip');
   if(timeChip) timeChip.textContent = effDate.toLocaleString(undefined, {hour:'2-digit', minute:'2-digit', month:'short', day:'numeric'});
+  const precisionChip=document.getElementById('skyPrecisionChip');
+  if(precisionChip) precisionChip.textContent=precisionAvailable?'✦ Astronomy Engine · improved positions':'✦ Approximate positions';
   if(locChip) locChip.textContent = `${liveSky.lat.toFixed(1)}°, ${liveSky.lon.toFixed(1)}°`;
 
   sky3DUpdatePositions(frame);
@@ -2667,7 +2792,7 @@ function skyRecomputeAndDraw(){
 function sky3DUpdatePositions(f){
   if(!liveSky || !liveSky.scene) return;
   const starMap = {};
-  f.stars.forEach((s,idx)=>{ starMap[s.n] = s; liveSky.starSprites[idx].visible = s.alt>0; if(s.alt>0) liveSky.starSprites[idx].position.copy(skyAltAzToVec3(s.alt,s.az)); });
+  f.stars.forEach((s,idx)=>{ starMap[s.n] = s; const visible=s.alt>0 && f.sunAlt < -2; liveSky.starSprites[idx].visible = visible; if(visible) liveSky.starSprites[idx].position.copy(skyAltAzToVec3(s.alt,s.az)); });
 
   Object.keys(liveSky.planetSprites).forEach(key=>{
     const p = f.planets[key];
@@ -2689,7 +2814,7 @@ function sky3DUpdatePositions(f){
 
   // rebuild constellation lines
   liveSky.lineGroup.clear();
-  if(f.sunAlt < 8){
+  if(f.sunAlt < -2){
     const lineMat = new THREE.LineBasicMaterial({color:0x8b5cf6, transparent:true, opacity:0.45});
     Object.keys(SKY_CONSTELLATION_LINES).forEach(con=>{
       SKY_CONSTELLATION_LINES[con].forEach(([n1,n2])=>{
@@ -5849,7 +5974,7 @@ routes.profile = function(){
 })();
 
 /* =========================================================
-   Dubis — Gemini-powered learning companion
+   Dubis — Claude-powered learning companion
    ========================================================= */
 let aiHistory = [];
 function toggleAI(){
@@ -6027,7 +6152,7 @@ function checkStreak(){
 /* =========================================================
    Account / Auth / Cloud Progress Sync
    ========================================================= */
-const authState = { loggedIn:false, user:null, syncing:false, syncError:false, lastSyncedAt:null };
+const authState = { loggedIn:false, user:null, syncing:false, lastSyncedAt:null };
 let cloudSyncTimer = null;
 let authFormError = '';
 
@@ -6067,7 +6192,7 @@ function updateAccountButton(){
   const btn = document.getElementById('accountBtn');
   if(!btn) return;
   if(authState.loggedIn && authState.user){
-    btn.textContent = authState.user.avatar || '🐱';
+    btn.textContent = authState.user.username.charAt(0).toUpperCase();
     btn.classList.add('signed-in');
     btn.title = authState.user.username;
   } else {
@@ -6092,18 +6217,6 @@ function togglePasswordVisibility(inputId, btn){
   btn.textContent = showing ? '👁️' : '🙈';
 }
 
-const AVATAR_CHOICES = ['🐱','🐰','🐻','🐼','🦊','🐸','🐨','🐹','🐧','🦄','🐶','🐣','🦋','🐢','🐳','🍓','🍑','🍒','🍉','🍊','🍰','🍩','🧋','🍪','🍙','🥑','👩🏻‍🚀','👨🏽‍🚀','🧑🏻‍🎨','👩🏽‍🔬','🧑🏼‍🚀','👨🏻‍🎓','🌷','🌙','⭐','🪐'];
-let selectedAvatar = '🐱';
-function renderAvatarOptions(items, selected){
-  return items.map((avatar, i) => `<button type="button" class="avatar-option ${avatar===selected?'selected':''}" data-avatar="${avatar}" aria-label="Choose avatar ${i+1}" onclick="selectAuthAvatar(this)">${avatar}</button>`).join('');
-}
-function selectAuthAvatar(button){
-  selectedAvatar = button.dataset.avatar;
-  const hidden = document.getElementById('authAvatar');
-  if(hidden) hidden.value = selectedAvatar;
-  document.querySelectorAll('.avatar-option').forEach(el=>el.classList.toggle('selected', el.dataset.avatar===selectedAvatar));
-}
-
 function renderAuthForm(mode, isWelcome){
   authFormError = '';
   const headline = isWelcome ? 'Welcome to Aura Cosmos' : (mode==='login' ? 'Welcome back' : 'Create your account');
@@ -6124,20 +6237,10 @@ function renderAuthForm(mode, isWelcome){
       <div class="auth-field">
         <label>USERNAME</label>
         <input type="text" id="authUsername" autocomplete="username" placeholder="cosmic_cadet" maxlength="20">
-      </div>
-      <div class="auth-field">
-        <label>CHOOSE YOUR AVATAR</label>
-        <div class="avatar-category">PASTEL ANIMALS</div>
-        <div class="avatar-picker">${renderAvatarOptions(['🐱','🐰','🐻','🐼','🦊','🐸','🐨','🐹','🐧','🦄','🐶','🐣','🦋','🐢','🐳'],'🐱')}</div>
-        <div class="avatar-category">SWEET TREATS & FRUITS</div>
-        <div class="avatar-picker">${renderAvatarOptions(['🍓','🍑','🍒','🍉','🍊','🍰','🍩','🧋','🍪','🍙','🥑'],'🐱')}</div>
-        <div class="avatar-category">PEOPLE & COSMIC VIBES</div>
-        <div class="avatar-picker">${renderAvatarOptions(['👩🏻‍🚀','👨🏽‍🚀','🧑🏻‍🎨','👩🏽‍🔬','🧑🏼‍🚀','👨🏻‍🎓','🌷','🌙','⭐','🪐'],'🐱')}</div>
-        <input type="hidden" id="authAvatar" value="🐱">
       </div>` : ''}
       <div class="auth-field">
-        <label>EMAIL</label>
-        <input type="email" id="authIdentifier" autocomplete="email" placeholder="you@example.com" required>
+        <label>${mode==='login' ? 'EMAIL OR USERNAME' : 'EMAIL'}</label>
+        <input type="${mode==='login'?'text':'email'}" id="authIdentifier" autocomplete="${mode==='login'?'username':'email'}" placeholder="you@example.com">
       </div>
       <div class="auth-field">
         <label>PASSWORD</label>
@@ -6161,12 +6264,6 @@ function renderAuthForm(mode, isWelcome){
     ${isWelcome ? `<button class="btn ghost small" style="margin-top:12px;width:100%;" onclick="closeModal()">Continue as Guest</button>` : ''}
     <p style="font-size:10.5px;color:var(--text-faint);margin-top:16px;line-height:1.5;">Your password is hashed with bcrypt and never stored in plain text or sent to anyone else. You can keep exploring without an account — progress saves locally either way.</p>
   `);
-  if(mode==='signup') {
-    selectedAvatar = '🐱';
-    const hidden = document.getElementById('authAvatar');
-    if(hidden) hidden.value = selectedAvatar;
-    document.querySelectorAll('.avatar-option').forEach(el=>el.classList.toggle('selected', el.dataset.avatar===selectedAvatar));
-  }
 }
 
 function showAuthError(msg){
@@ -6188,7 +6285,6 @@ async function submitSignup(){
   const email = document.getElementById('authIdentifier').value.trim();
   const password = document.getElementById('authPassword').value;
   const passwordConfirm = document.getElementById('authPasswordConfirm').value;
-  const avatar = document.getElementById('authAvatar')?.value || '🐱';
   document.getElementById('authError').classList.remove('show');
 
   if(!username || !email || !password || !passwordConfirm){ showAuthError('Please fill in every field.'); return; }
@@ -6202,7 +6298,7 @@ async function submitSignup(){
     const res = await fetch('/api/auth/signup', {
       method:'POST', credentials:'same-origin',
       headers:{'Content-Type':'application/json','X-Requested-With':'AuraCosmos'},
-      body: JSON.stringify({username, email, password, avatar})
+      body: JSON.stringify({username, email, password})
     });
     const data = await res.json().catch(()=>({}));
     if(!res.ok){ setAuthBusy(false); showAuthError(data.error || 'Could not create your account.'); return; }
@@ -6224,7 +6320,7 @@ async function submitLogin(){
   const password = document.getElementById('authPassword').value;
   document.getElementById('authError').classList.remove('show');
 
-  if(!identifier || !password){ showAuthError('Please enter your email and password.'); return; }
+  if(!identifier || !password){ showAuthError('Please enter your email/username and password.'); return; }
   setAuthBusy(true, 'Signing in…');
   try{
     const res = await fetch('/api/auth/login', {
@@ -6259,19 +6355,18 @@ async function logoutAccount(){
 
 function renderAccountSummary(){
   const u = authState.user;
-  const avatar = u.avatar || '🐱';
+  const initial = u.username.charAt(0).toUpperCase();
   const lastSync = authState.lastSyncedAt ? new Date(authState.lastSyncedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : 'just now';
   openModal(`
     <div class="eyebrow">Account</div>
     <div class="account-summary">
-      <div class="account-avatar">${avatar}</div>
+      <div class="account-avatar">${initial}</div>
       <div>
         <div class="account-name">${escapeHtml(u.username)}</div>
         <div class="account-email">${escapeHtml(u.email)}</div>
       </div>
     </div>
     <div class="sync-status"><span class="sync-dot" id="syncDot"></span><span id="syncStatusText">Cloud sync active · last synced ${lastSync}</span></div>
-    <button class="btn ghost small" style="width:100%;margin-bottom:12px;" onclick="renderAvatarEditor()">Change avatar ✨</button>
     <div class="stat-grid">
       <div class="glass stat-box"><div class="num">${state.xp}</div><div class="lbl">TOTAL XP</div></div>
       <div class="glass stat-box"><div class="num">LV.${getLevel()}</div><div class="lbl">LEVEL</div></div>
@@ -6286,7 +6381,6 @@ function renderAccountSummary(){
 async function pushCloudProgress(silent){
   if(!authState.loggedIn) return;
   authState.syncing = true;
-  authState.syncError = false;
   updateSyncIndicator();
   try{
     const res = await fetch('/api/progress', {
@@ -6296,14 +6390,9 @@ async function pushCloudProgress(silent){
     });
     if(res.ok){
       authState.lastSyncedAt = Date.now();
-      authState.syncError = false;
-    } else {
-      authState.syncError = true;
-      console.warn('[cloud-sync] save failed:', res.status);
     }
   }catch(e){
-    authState.syncError = true;
-    console.warn('[cloud-sync] network error; progress remains on this device until the next successful sync.');
+    // silent — next successful save will retry via scheduleCloudSync
   }
   authState.syncing = false;
   updateSyncIndicator();
@@ -6336,40 +6425,12 @@ async function pullCloudProgressWithMergeCheck(){
   if(!cloudHasContent){
     return; // nothing to adopt either way
   }
-  if(cloudHasContent && localHasContent && progressFingerprint(state) !== progressFingerprint(cloud)){
+  if(cloudHasContent && localHasContent && (state.xp||0) > (cloud.xp||0) + 20){
     // both have real, differing progress — let the person choose rather than silently discarding either
     showProgressMergeChoice(cloud);
     return;
   }
   adoptCloudProgress(cloud);
-}
-
-function progressFingerprint(value){
-  const normalize = v => {
-    if(Array.isArray(v)) return v.map(normalize);
-    if(v && typeof v==='object') {
-      const out={};
-      Object.keys(v).filter(k=>k!=='updatedAt').sort().forEach(k=>out[k]=normalize(v[k]));
-      return out;
-    }
-    return v;
-  };
-  return JSON.stringify(normalize(value || {}));
-}
-
-function renderAvatarEditor(){
-  const current = authState.user?.avatar || '🐱';
-  openModal(`<div class="eyebrow">Your cosmic identity</div><h2>Pick a new avatar</h2><div class="m-sub">Choose a cute little face for your profile.</div><div class="avatar-picker">${renderAvatarOptions(AVATAR_CHOICES,current)}</div><div class="auth-error" id="avatarError"></div><button class="btn" style="width:100%" onclick="saveAvatarChoice()">Save avatar ✨</button>`);
-  selectedAvatar = current;
-  document.querySelectorAll('.avatar-option').forEach(el=>el.classList.toggle('selected', el.dataset.avatar===selectedAvatar));
-}
-async function saveAvatarChoice(){
-  try{
-    const res=await fetch('/api/auth/avatar',{method:'PATCH',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Requested-With':'AuraCosmos'},body:JSON.stringify({avatar:selectedAvatar})});
-    const data=await res.json().catch(()=>({}));
-    if(!res.ok){const el=document.getElementById('avatarError');if(el){el.textContent=data.error||'Could not update avatar.';el.classList.add('show');}return;}
-    authState.user=data.user;updateAccountButton();renderAccountSummary();showToast('Avatar updated! ✨');
-  }catch(e){const el=document.getElementById('avatarError');if(el){el.textContent='Could not reach the server. Try again.';el.classList.add('show');}}
 }
 
 function adoptCloudProgress(cloud){
@@ -6413,15 +6474,8 @@ function updateSyncIndicator(){
   if(authState.syncing){
     dot.classList.add('syncing');
     text.textContent = 'Syncing…';
-  } else if(authState.syncError){
-    dot.classList.remove('syncing');
-    dot.style.background='var(--danger)';
-    dot.style.boxShadow='0 0 6px var(--danger)';
-    text.textContent = 'Cloud save failed · this device still has your latest progress';
   } else {
     dot.classList.remove('syncing');
-    dot.style.background='var(--good)';
-    dot.style.boxShadow='0 0 6px var(--good)';
     const t = authState.lastSyncedAt ? new Date(authState.lastSyncedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : 'just now';
     text.textContent = `Cloud sync active · last synced ${t}`;
   }
