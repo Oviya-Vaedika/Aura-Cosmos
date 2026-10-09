@@ -40,7 +40,6 @@ function createRateLimiter(maxRequests, windowMs) {
     recent.push(now);
     buckets.set(key, recent);
 
-    // Prevent old IP entries from accumulating indefinitely.
     if (buckets.size > 5000) {
       for (const [ip, times] of buckets) {
         if (!times.some(timestamp => now - timestamp < windowMs)) {
@@ -59,9 +58,7 @@ const progressLimiter = createRateLimiter(60, 60 * 1000);
 const avatarLimiter = createRateLimiter(20, 60 * 1000);
 
 function clientIp(req) {
-  return req.ip ||
-    req.socket?.remoteAddress ||
-    'unknown';
+  return req.ip || req.socket?.remoteAddress || 'unknown';
 }
 
 /* ===========================================================
@@ -225,12 +222,10 @@ app.post('/api/auth/login', async (req, res) => {
       });
     }
 
-    // Email is the preferred login method.
     const user = isValidEmail(identifier)
       ? db.findUserByEmail(identifier)
       : db.findUserByUsername(identifier);
 
-    // Use a dummy hash when the account does not exist.
     const passwordMatches = user
       ? await auth.verifyPassword(password, user.passwordHash)
       : await auth.verifyPassword(password, auth.DUMMY_HASH);
@@ -277,9 +272,7 @@ app.get('/api/auth/me', (req, res) => {
   const token = req.cookies?.[auth.COOKIE_NAME];
 
   if (!token) {
-    return res.status(401).json({
-      error: 'Not signed in.'
-    });
+    return res.status(401).json({ error: 'Not signed in.' });
   }
 
   const payload = auth.verifyToken(token);
@@ -298,9 +291,7 @@ app.get('/api/auth/me', (req, res) => {
     });
   }
 
-  return res.json({
-    user: publicUser(user)
-  });
+  return res.json({ user: publicUser(user) });
 });
 
 /* ===========================================================
@@ -332,9 +323,7 @@ app.put(
 
       const user = db.updateUserAvatar(req.userId, avatar);
 
-      return res.json({
-        user: publicUser(user)
-      });
+      return res.json({ user: publicUser(user) });
     } catch (error) {
       console.error('[auth/avatar] error:', error);
 
@@ -349,29 +338,23 @@ app.put(
    CLOUD PROGRESS
 =========================================================== */
 
-app.get(
-  '/api/progress',
-  auth.requireAuth,
-  (req, res) => {
-    if (progressLimiter(clientIp(req))) {
-      return res.status(429).json({
-        error: 'Too many requests. Please slow down.'
-      });
-    }
-
-    try {
-      return res.json({
-        progress: db.getProgress(req.userId)
-      });
-    } catch (error) {
-      console.error('[progress/get] error:', error);
-
-      return res.status(500).json({
-        error: 'Could not load your progress.'
-      });
-    }
+app.get('/api/progress', auth.requireAuth, (req, res) => {
+  if (progressLimiter(clientIp(req))) {
+    return res.status(429).json({
+      error: 'Too many requests. Please slow down.'
+    });
   }
-);
+
+  try {
+    return res.json({ progress: db.getProgress(req.userId) });
+  } catch (error) {
+    console.error('[progress/get] error:', error);
+
+    return res.status(500).json({
+      error: 'Could not load your progress.'
+    });
+  }
+});
 
 app.put(
   '/api/progress',
@@ -393,10 +376,8 @@ app.put(
     }
 
     try {
-      const saved = db.saveProgress(req.userId, body);
-
       return res.json({
-        progress: saved
+        progress: db.saveProgress(req.userId, body)
       });
     } catch (error) {
       console.error('[progress/put] error:', error);
@@ -412,141 +393,154 @@ app.put(
    DUBIS — GEMINI AI PROXY
 =========================================================== */
 
-app.post(
-  '/api/dubis',
-  auth.requireAuth,
-  async (req, res) => {
-    if (dubisLimiter(clientIp(req))) {
-      return res.status(429).json({
-        error: 'Too many Dubis requests. Please wait a minute.'
-      });
-    }
+app.post('/api/dubis', auth.requireAuth, async (req, res) => {
+  console.log('[dubis] Request received');
 
-    if (!GEMINI_API_KEY) {
-      return res.status(503).json({
-        error: 'Dubis is temporarily unavailable.'
-      });
-    }
+  if (dubisLimiter(clientIp(req))) {
+    return res.status(429).json({
+      error: 'Too many Dubis requests. Please wait a minute.'
+    });
+  }
 
-    const { system, messages } = req.body || {};
+  if (!GEMINI_API_KEY) {
+    console.error('[dubis] GEMINI_API_KEY is missing');
 
+    return res.status(503).json({
+      error: 'Dubis is temporarily unavailable.'
+    });
+  }
+
+  const body = req.body || {};
+  const system = body.system;
+  const messages = body.messages;
+
+  console.log('[dubis] Request shape:', {
+    systemType: typeof system,
+    systemLength: typeof system === 'string' ? system.length : null,
+    messagesType: Array.isArray(messages) ? 'array' : typeof messages,
+    messagesCount: Array.isArray(messages) ? messages.length : null
+  });
+
+  if (
+    typeof system !== 'string' ||
+    system.trim().length === 0 ||
+    system.length > 50000 ||
+    !Array.isArray(messages) ||
+    messages.length === 0 ||
+    messages.length > 20
+  ) {
+    console.warn('[dubis] Invalid request shape');
+
+    return res.status(400).json({
+      error: 'Invalid Dubis request. Expected a system string and a messages array.'
+    });
+  }
+
+  let totalCharacters = system.length;
+
+  for (const message of messages) {
     if (
-      typeof system !== 'string' ||
-      system.length > 8000 ||
-      !Array.isArray(messages) ||
-      messages.length === 0 ||
-      messages.length > 20
+      !message ||
+      !['user', 'assistant'].includes(message.role) ||
+      typeof message.content !== 'string' ||
+      message.content.trim().length === 0 ||
+      message.content.length > 12000
     ) {
       return res.status(400).json({
-        error: 'Invalid Dubis request.'
+        error: 'A message is invalid or too long.'
       });
     }
 
-    let totalCharacters = system.length;
-
-    for (const message of messages) {
-      if (
-        !message ||
-        !['user', 'assistant'].includes(message.role) ||
-        typeof message.content !== 'string' ||
-        message.content.length > 8000
-      ) {
-        return res.status(400).json({
-          error: 'A message is invalid or too long.'
-        });
-      }
-
-      totalCharacters += message.content.length;
-    }
-
-    if (totalCharacters > 30000) {
-      return res.status(400).json({
-        error: 'This conversation is too long. Please start a new chat.'
-      });
-    }
-
-    const contents = messages.map(message => ({
-      role: message.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: message.content }]
-    }));
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(
-      () => controller.abort(),
-      UPSTREAM_TIMEOUT_MS
-    );
-
-    try {
-      const url =
-        'https://generativelanguage.googleapis.com/v1beta/models/' +
-        `${GEMINI_MODEL}:generateContent`;
-
-      const upstream = await fetch(url, {
-        method: 'POST',
-        signal: controller.signal,
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': GEMINI_API_KEY
-        },
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [{ text: system }]
-          },
-          contents,
-          generationConfig: {
-            maxOutputTokens: 2048
-          }
-        })
-      });
-
-      if (!upstream.ok) {
-        const errorText = await upstream.text().catch(() => '');
-
-        console.error(
-          `[dubis] Gemini returned ${upstream.status}:`,
-          errorText.slice(0, 1000)
-        );
-
-        return res.status(upstream.status === 429 ? 429 : 502).json({
-          error: upstream.status === 429
-            ? 'Dubis is busy right now. Please try again shortly.'
-            : 'The AI service returned an error. Please try again.'
-        });
-      }
-
-      const data = await upstream.json();
-
-      const reply = data?.candidates?.[0]?.content?.parts
-        ?.map(part => part.text || '')
-        .join('')
-        .trim();
-
-      if (!reply) {
-        console.error('[dubis] Empty or unexpected Gemini response.');
-
-        return res.status(502).json({
-          error: 'Dubis could not generate a reply. Please try again.'
-        });
-      }
-
-      return res.json({ reply });
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        return res.status(504).json({
-          error: 'Dubis took too long to respond. Please try again.'
-        });
-      }
-
-      console.error('[dubis] error:', error);
-
-      return res.status(500).json({
-        error: 'Unexpected Dubis server error.'
-      });
-    } finally {
-      clearTimeout(timeoutId);
-    }
+    totalCharacters += message.content.length;
   }
-);
+
+  if (totalCharacters > 80000) {
+    return res.status(400).json({
+      error: 'This conversation is too long. Please start a new chat.'
+    });
+  }
+
+  const contents = messages.map(message => ({
+    role: message.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: message.content }]
+  }));
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    UPSTREAM_TIMEOUT_MS
+  );
+
+  try {
+    const url =
+      'https://generativelanguage.googleapis.com/v1beta/models/' +
+      `${GEMINI_MODEL}:generateContent`;
+
+    const upstream = await fetch(url, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': GEMINI_API_KEY
+      },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: system }]
+        },
+        contents,
+        generationConfig: {
+          maxOutputTokens: 2048
+        }
+      })
+    });
+
+    if (!upstream.ok) {
+      const errorText = await upstream.text().catch(() => '');
+
+      console.error(
+        `[dubis] Gemini returned ${upstream.status}:`,
+        errorText.slice(0, 1000)
+      );
+
+      return res.status(upstream.status === 429 ? 429 : 502).json({
+        error: upstream.status === 429
+          ? 'Dubis is busy right now. Please try again shortly.'
+          : 'The AI service returned an error. Please try again.'
+      });
+    }
+
+    const data = await upstream.json();
+
+    const reply = data?.candidates?.[0]?.content?.parts
+      ?.map(part => part.text || '')
+      .join('')
+      .trim();
+
+    if (!reply) {
+      console.error('[dubis] Empty or unexpected Gemini response.');
+
+      return res.status(502).json({
+        error: 'Dubis could not generate a reply. Please try again.'
+      });
+    }
+
+    return res.json({ reply });
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      return res.status(504).json({
+        error: 'Dubis took too long to respond. Please try again.'
+      });
+    }
+
+    console.error('[dubis] error:', error);
+
+    return res.status(500).json({
+      error: 'Unexpected Dubis server error.'
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+});
 
 /* ===========================================================
    HEALTH CHECK
